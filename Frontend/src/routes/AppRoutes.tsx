@@ -3,23 +3,19 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginPage from '../pages/Login'; 
 import HomePage from '../pages/Home';
+import RegisterPage from '../pages/Cadastrar';
+import ResetPassword from '../pages/ResetPassword';
 
 const Stack = createNativeStackNavigator();
 
 export default function AppRoutes() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen
-          name="Login"
-          component={LoginPage}
-          options={{ title: 'Login' }}
-        />
-        <Stack.Screen
-          name="Home"
-          component={HomePage}
-          options={{ title: 'Página Inicial' }}
-        />
+  <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Login" component={LoginPage} />   
+        <Stack.Screen name="Register" component={RegisterPage} />
+        <Stack.Screen name="ResetPassword" component={ResetPassword} />
+        <Stack.Screen name="Home"component={HomePage} />
       </Stack.Navigator>
     </NavigationContainer>
   );

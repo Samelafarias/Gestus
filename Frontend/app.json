@@ -25,6 +25,9 @@
     },
     "web": {
       "favicon": "./assets/Logo.png"
-    }
+    },
+    "plugins": [
+      "expo-font"
+    ]
   }
 }
