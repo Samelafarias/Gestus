@@ -5,6 +5,7 @@ import LoginPage from '../pages/Login';
 import HomePage from '../pages/Home';
 import RegisterPage from '../pages/Cadastrar';
 import ResetPassword from '../pages/ResetPassword';
+import RedefinirSenha from '../pages/RedefinirSenha';
 
 const Stack = createNativeStackNavigator();
 
@@ -15,6 +16,7 @@ export default function AppRoutes() {
         <Stack.Screen name="Login" component={LoginPage} />   
         <Stack.Screen name="Register" component={RegisterPage} />
         <Stack.Screen name="ResetPassword" component={ResetPassword} />
+        <Stack.Screen name="ResetPassword:token" component={RedefinirSenha} />
         <Stack.Screen name="Home"component={HomePage} />
       </Stack.Navigator>
     </NavigationContainer>
