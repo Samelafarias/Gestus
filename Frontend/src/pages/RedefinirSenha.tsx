@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvo
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import * as AuthStorage from '../services/AuthStorage'; // Importação do novo serviço
+import * as AuthStorage from '../services/AuthService'; // Importação do novo serviço
 
 const styles = StyleSheet.create({
     container: {

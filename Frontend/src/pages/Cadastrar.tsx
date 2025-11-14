@@ -14,7 +14,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import * as AuthStorage from '../services/AuthStorage'; // Importação do novo serviço
+import * as AuthStorage from '../services/AuthService'; // Importação do novo serviço
 
 const styles = StyleSheet.create({
   container: {
