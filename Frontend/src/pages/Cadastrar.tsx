@@ -13,7 +13,8 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons'; // Para os ícones
+import { Ionicons } from '@expo/vector-icons';
+import * as AuthStorage from '../services/AuthStorage'; // Importação do novo serviço
 
 const styles = StyleSheet.create({
   container: {
@@ -128,7 +129,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleRegister = () => {
+  const handleRegister = async () => { // Função agora é assíncrona
     if (!nome || !email || !password || !confirmPassword) {
       Alert.alert('Campos obrigatórios', 'Por favor, preencha todos os campos.');
       return;
@@ -138,9 +139,28 @@ export default function RegisterPage() {
       Alert.alert('Erro', 'As senhas não coincidem. Por favor, verifique.');
       return;
     }
+    
+    // 1. Verifica se já existe um usuário (simulando que é um app de usuário único)
+    const storedUser = await AuthStorage.getStoredUser();
+    if (storedUser) {
+        Alert.alert('Erro', 'Já existe uma conta cadastrada neste dispositivo. Por favor, faça login.');
+        return;
+    }
 
-    Alert.alert('Sucesso', 'Cadastro realizado! Agora você pode fazer login.');
-    navigation.navigate('Login'); 
+    // 2. Salva o novo usuário no AsyncStorage
+    try {
+        await AuthStorage.saveUser({ 
+            name: nome, 
+            email: email, 
+            passwordHash: password // Salvando a senha pura, o que é inseguro, mas ok para este app offline
+        });
+        
+        Alert.alert('Sucesso', 'Cadastro realizado! Agora você pode fazer login.');
+        navigation.navigate('Login'); 
+
+    } catch (e) {
+        Alert.alert('Erro', 'Falha ao salvar o cadastro no dispositivo.');
+    }
   };
 
   return (

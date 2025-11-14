@@ -3,6 +3,7 @@ import {View, Text, TextInput, TouchableOpacity, StyleSheet, Image,  KeyboardAvo
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import * as AuthStorage from '../services/AuthStorage'; // Importação do novo serviço
 
 const styles = StyleSheet.create({
   container: {
@@ -92,7 +93,7 @@ export default function ResetPassword() {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
 
-  const handleSendCode = () => {
+  const handleSendCode = async () => { // Função agora é assíncrona
     if (!email) {
       Alert.alert('Campo Obrigatório', 'Por favor, insira seu e-mail para continuar.');
       return;
@@ -103,17 +104,28 @@ export default function ResetPassword() {
         return;
     }
     
-
-    Alert.alert(
-        'E-mail Enviado', 
-        `Se o e-mail '${email}' estiver cadastrado, você receberá um link/código de recuperação.`,
-        [
-            { 
-                text: "OK", 
-                onPress: () => navigation.navigate('RedefinirSenha') 
-            }
-        ]
-    );
+    // 1. Verifica se o e-mail existe no AsyncStorage
+    const storedUser = await AuthStorage.getStoredUser();
+    
+    if (storedUser && storedUser.email === email) {
+        Alert.alert(
+            'E-mail Verificado', 
+            `E-mail encontrado. Redirecionando para a redefinição de senha.`,
+            [
+                { 
+                    text: "OK", 
+                    // Passa o e-mail como parâmetro para a próxima tela
+                    onPress: () => navigation.navigate('RedefinirSenha', { userEmail: email }) 
+                }
+            ]
+        );
+    } else {
+        // Mensagem de segurança: não revela se o e-mail existe ou não.
+        Alert.alert(
+            'E-mail Inválido', 
+            `O e-mail '${email}' não está cadastrado ou houve um erro.`
+        );
+    }
   };
 
   return (

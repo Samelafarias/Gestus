@@ -16,7 +16,7 @@ export default function AppRoutes() {
         <Stack.Screen name="Login" component={LoginPage} />   
         <Stack.Screen name="Register" component={RegisterPage} />
         <Stack.Screen name="ResetPassword" component={ResetPassword} />
-        <Stack.Screen name="ResetPassword:token" component={RedefinirSenha} />
+        <Stack.Screen name="RedefinirSenha" component={RedefinirSenha} />
         <Stack.Screen name="Home"component={HomePage} />
       </Stack.Navigator>
     </NavigationContainer>

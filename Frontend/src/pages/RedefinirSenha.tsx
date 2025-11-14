@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView, Alert,} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import * as AuthStorage from '../services/AuthStorage'; // Importação do novo serviço
 
 const styles = StyleSheet.create({
     container: {
@@ -88,15 +89,22 @@ const styles = StyleSheet.create({
     },
 });
 
+// Define o tipo para os parâmetros de rota, se necessário
+interface RedefinirSenhaRouteParams {
+    userEmail?: string;
+}
+
 export default function RedefinirSenha() {
     const navigation = useNavigation();
-    
+    const route = useRoute();
+    const { userEmail } = route.params as RedefinirSenhaRouteParams; // Pega o e-mail passado
+
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
 
-    const handleRedefinirSenha = () => {
+    const handleRedefinirSenha = async () => { // Função agora é assíncrona
        if (!password || !confirmPassword) {
           Alert.alert('Campos Obrigatórios', 'Por favor, preencha a nova senha e a confirmação.');
           return;
@@ -112,17 +120,24 @@ export default function RedefinirSenha() {
           return;
        }
 
-       Alert.alert(
-          'Sucesso!', 
-          'Sua senha foi redefinida com sucesso. Faça login para continuar.',
-          [
-             { 
-                text: "Fazer Login", 
-                onPress: () => navigation.navigate('Login') 
+       // 1. Atualiza a senha no AsyncStorage
+       const success = await AuthStorage.updatePassword(password);
+       
+       if (success) {
+            Alert.alert(
+                'Sucesso!', 
+                'Sua senha foi redefinida com sucesso. Faça login para continuar.',
+                [
+                   { 
+                      text: "Fazer Login", 
+                      onPress: () => navigation.navigate('Login') 
 
-             }
-          ]
-       );
+                   }
+                ]
+             );
+       } else {
+            Alert.alert('Erro', 'Falha ao redefinir a senha. Tente novamente.');
+       }
     };
 
     return (
@@ -143,7 +158,7 @@ export default function RedefinirSenha() {
           <View style={styles.formContainer}>
             <Text style={styles.loginTitle}>Redefinir Senha</Text>
             <Text style={styles.formSubtitle}>
-             Redefina sua nova senha.
+             Redefina sua nova senha. (Conta: {userEmail || 'Desconhecida'})
             </Text>
 
             <Text style={styles.label}>Nova Senha:</Text>
