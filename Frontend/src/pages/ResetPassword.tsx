@@ -3,7 +3,7 @@ import {View, Text, TextInput, TouchableOpacity, StyleSheet, Image,  KeyboardAvo
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import * as AuthStorage from '../services/AuthService'; // Importação do novo serviço
+import * as AuthStorage from '../services/AuthService'; 
 
 const styles = StyleSheet.create({
   container: {
@@ -93,7 +93,7 @@ export default function ResetPassword() {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
 
-  const handleSendCode = async () => { // Função agora é assíncrona
+  const handleSendCode = async () => { 
     if (!email) {
       Alert.alert('Campo Obrigatório', 'Por favor, insira seu e-mail para continuar.');
       return;

@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#000',
     marginBottom: 5,
-    marginLeft: 5, // Pequeno ajuste para alinhar com o input
+    marginLeft: 5, 
   },
   inputWrapper: {
     backgroundColor: '#f7f7f7',
