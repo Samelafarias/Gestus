@@ -127,7 +127,7 @@ export default function LoginPage() {
     if (storedUser && storedUser.email === email && storedUser.passwordHash === password) {
         // Sucesso: registra o login e navega
         await AuthStorage.setLoggedIn(true);
-          navigation.navigate('Home'); 
+          navigation.navigate('App'); 
     } else {
         // Falha: Verifica se há algum usuário cadastrado. Se não houver, sugere cadastro.
         if (!storedUser) {
