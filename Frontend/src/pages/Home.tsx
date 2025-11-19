@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import AddAssinatura from './AddAssinaruras';
+import AddButton from '../components/AddButton';
 
 const styles = StyleSheet.create({
   container: {
@@ -20,17 +22,18 @@ const styles = StyleSheet.create({
   },
 });
 
-const HomePage = () => {
+const ListaAssinaturas = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        Hello World! 🌎
+       Suas assinaturas 📝
       </Text>
       <Text style={styles.subtitle}>
-        Página Home Carregada com Sucesso.
+        Página Assinaturas Carregada com Sucesso.
       </Text>
+      <AddButton />
     </View>
   );
 };
 
-export default HomePage;
+export default ListaAssinaturas;

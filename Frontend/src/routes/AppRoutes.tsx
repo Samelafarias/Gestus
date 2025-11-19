@@ -8,6 +8,7 @@ import ResetPassword from '../pages/ResetPassword';
 import RedefinirSenha from '../pages/RedefinirSenha';
 import ListaAssinaturas from '../pages/ListaAssinaturas';
 import DrawerStack from './DrawerStack';
+import AddAssinatura from '../pages/AddAssinaruras';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +22,7 @@ export default function AppRoutes() {
         <Stack.Screen name="ResetPassword" component={ResetPassword} />
         <Stack.Screen name="RedefinirSenha" component={RedefinirSenha} />       
         <Stack.Screen name="App" component={DrawerStack} options={{ headerShown: false }} />
+        <Stack.Screen name='AddAssinatura' component={AddAssinatura} options={{presentation:'modal',  headerShown: false}} />
       </Stack.Navigator>
     </NavigationContainer>
   );

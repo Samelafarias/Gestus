@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import AddButton from '../components/AddButton';
 
 const styles = StyleSheet.create({
   container: {
@@ -29,6 +30,7 @@ const AssinaturasInativas = () => {
       <Text style={styles.subtitle}>
         Página Home Carregada com Sucesso.
       </Text>
+      <AddButton />
     </View>
   );
 };
