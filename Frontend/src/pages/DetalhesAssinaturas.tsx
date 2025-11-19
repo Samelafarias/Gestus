@@ -20,17 +20,17 @@ const styles = StyleSheet.create({
   },
 });
 
-const HomePage = () => {
+const DetalhesAssinaturas = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
         Hello World! 🌎
       </Text>
       <Text style={styles.subtitle}>
-        Página Home Carregada com Sucesso.
+        Página Detalhe das suas assinaturas Carregada com Sucesso.
       </Text>
     </View>
   );
 };
 
-export default HomePage;
+export default DetalhesAssinaturas;

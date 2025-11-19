@@ -10,7 +10,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 20,
-    paddingTop: Platform.OS === 'android' ? 30 : 50, 
     justifyContent: 'space-between',
     marginBottom: 10,
 },
@@ -50,7 +49,7 @@ const innerStyles = StyleSheet.create({
     innerWhiteView: {
         flex: 1,
         backgroundColor: '#fff',
-        margin: 2, 
+        margin: 3, 
         borderTopRightRadius: 28, 
         borderBottomRightRadius: 28,
         overflow: 'hidden',

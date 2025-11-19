@@ -1,16 +1,15 @@
-// Frontend/src/routes/DrawerStack.tsx
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer'; 
 import CustomDrawerContent from '../components/CustomDrawerContent'; 
 import { Ionicons } from '@expo/vector-icons'; 
 import HomePage from '../pages/Home';
-import ListaAssinaturas from '../pages/ListaAssinaturas';
-// import EdicaoAssinaturas from '../pages/EdicaoAssinaturas';
-// import AssinaturasInativas from '../pages/AssinaturasInativas';
-// import Relatorio from '../pages/Relatorio';
-// import Notificacoes from '../pages/Notificacoes';
-// import Configuracoes from '../pages/Configuracoes';
-// import AjudaSobre from '../pages/AjudaSobre';
+import ListaAssinaturas from '../pages/ListaAssinaturas'
+import AssinaturasInativas from '../pages/AssinaturasInativas';
+import RelatorioPage from '../pages/Relatorios';
+import Notificacao from '../pages/HistoricoNotificacao';
+import ConfiguracoesPage from '../pages/Consfiguracoes';
+import SobrePage from '../pages/Sobre';
+
 
 const Drawer = createDrawerNavigator();
 
@@ -57,9 +56,65 @@ export default function DrawerStack() {
                  component={ListaAssinaturas}
                 options={{
                     drawerLabel: 'Lista de Assinaturas', 
-                    title: 'Assinaturas',
+                    title: 'Minhas Assinaturas',
                     drawerIcon: ({ color, size }) => (
                          <Ionicons name="list-outline" color={color} size={size} />
+                    ),
+                }}
+            />
+       
+            <Drawer.Screen 
+                name="AssinaturasInativas" 
+                 component={AssinaturasInativas}
+                options={{
+                    drawerLabel: 'Assinaturas Inativas', 
+                    title: 'Assinaturas Inativas',
+                    drawerIcon: ({ color, size }) => (
+                         <Ionicons name="close-circle-outline" color={color} size={size} />
+                    ),
+                }}
+            />
+            <Drawer.Screen 
+                name="Relatorios" 
+                 component={RelatorioPage}
+                options={{
+                    drawerLabel: 'Relatorios', 
+                    title: 'Relatórios',
+                    drawerIcon: ({ color, size }) => (
+                         <Ionicons name="bar-chart-outline" color={color} size={size} />
+                    ),
+                }}
+            />
+            <Drawer.Screen 
+                name="HistoricoNotificacao" 
+                 component={Notificacao}
+                options={{
+                    drawerLabel: 'HistoricoNotificacao', 
+                    title: 'Histórico de Notificações',
+                    drawerIcon: ({ color, size }) => (
+                         <Ionicons name="notifications-outline" color={color} size={size} />
+                    ),
+                }}
+            />
+            <Drawer.Screen 
+                name="Configuracoes" 
+                 component={ConfiguracoesPage}
+                options={{
+                    drawerLabel: 'Configuracoes', 
+                    title: 'Configurações',
+                    drawerIcon: ({ color, size }) => (
+                         <Ionicons name="settings-outline" color={color} size={size} />
+                    ),
+                }}
+            />
+            <Drawer.Screen 
+                name="Sobre" 
+                 component={SobrePage}
+                options={{
+                    drawerLabel: 'Sobre', 
+                    title: 'Sobre / Ajuda',
+                    drawerIcon: ({ color, size }) => (
+                         <Ionicons name="help-circle-outline" color={color} size={size} />
                     ),
                 }}
             />

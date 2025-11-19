@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const HomePage = () => {
+const AddAssinatura = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
@@ -33,4 +33,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default AddAssinatura;
