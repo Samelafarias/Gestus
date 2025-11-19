@@ -9,6 +9,7 @@ import RelatorioPage from '../pages/Relatorios';
 import Notificacao from '../pages/HistoricoNotificacao';
 import ConfiguracoesPage from '../pages/Consfiguracoes';
 import SobrePage from '../pages/Sobre';
+import EdicaoAssinatura from '../pages/EdicaoAssinaturas';
 
 
 const Drawer = createDrawerNavigator();
@@ -59,6 +60,17 @@ export default function DrawerStack() {
                     title: 'Minhas Assinaturas',
                     drawerIcon: ({ color, size }) => (
                          <Ionicons name="list-outline" color={color} size={size} />
+                    ),
+                }}
+            />
+            <Drawer.Screen 
+                name="EdicaoAssinaturas" 
+                 component={EdicaoAssinatura}
+                options={{
+                    drawerLabel: 'Edicao de Assinaturas', 
+                    title: 'Editar Assinatura',
+                    drawerIcon: ({ color, size }) => (
+                         <Ionicons name="pencil-outline" color={color} size={size} />
                     ),
                 }}
             />
