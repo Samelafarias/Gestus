@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     listContent: {
-        paddingBottom: 100, // Espaço para não cobrir o AddButton
+        paddingBottom: 100,
     },
     loadingText: {
         color: '#fff',

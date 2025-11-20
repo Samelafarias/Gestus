@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert,
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import DateTimePickerModal from "react-native-modal-datetime-picker"; 
 import { Subscription } from '../types/Subscription';
 import { useSubscriptions } from '../context/SubscriptionContext'; 
 
@@ -29,6 +30,7 @@ const styles = StyleSheet.create({
     content: {
         padding: 20,
         paddingBottom: 80, 
+        marginTop: -6,
     },
     label: {
         fontSize: 14,
@@ -152,9 +154,7 @@ const OptionPicker: React.FC<{
 
 const AddAssinatura = () => {
     const navigation = useNavigation();
-
     const { add } = useSubscriptions();
-
     const [name, setName] = useState('');
     const [value, setValue] = useState('');
     const [recurrence, setRecurrence] = useState<Subscription['recurrence']>('Mensal');
@@ -162,6 +162,20 @@ const AddAssinatura = () => {
     const [category, setCategory] = useState<Subscription['category']>('Streaming');
     const [paymentMethod, setPaymentMethod] = useState('');
     const [notes, setNotes] = useState('');
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false); 
+
+    const showDatePicker = () => {
+        setDatePickerVisibility(true);
+    };
+
+    const hideDatePicker = () => {
+        setDatePickerVisibility(false);
+    };
+
+    const handleConfirm = (date: Date) => {
+        setFirstChargeDate(date);
+        hideDatePicker();
+    };
 
     const formatDateInput = (date: Date) => {
         return date.toLocaleDateString('pt-BR');
@@ -216,8 +230,7 @@ const AddAssinatura = () => {
                         placeholderTextColor="#aaa"
                         style={styles.input}
                         value={name}
-                        onChangeText={setName}
-                    />
+                        onChangeText={setName} />               
                 </View>
 
                 <Text style={styles.label}>Valor (R$):</Text>
@@ -228,36 +241,32 @@ const AddAssinatura = () => {
                         style={styles.input}
                         value={value}
                         onChangeText={setValue}
-                        keyboardType={Platform.OS === 'android' ? 'numeric' : 'numbers-and-punctuation'}
-                    />
+                        keyboardType={Platform.OS === 'android' ? 'numeric' : 'numbers-and-punctuation'}/>      
                 </View>
                 
                 <OptionPicker
                     label="Recorrência:"
                     options={RECURRENCE_OPTIONS}
                     selectedValue={recurrence}
-                    onSelect={setRecurrence as (v: string) => void}
-                />
-
+                    onSelect={setRecurrence as (v: string) => void}/>
+                
                 <Text style={styles.label}>Data da Primeira Cobrança:</Text>
                 <View style={styles.inputWrapper}>
                     <Text style={styles.inputDateDisplay}>
                        {formatDateInput(firstChargeDate)}
                     </Text>
 
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={showDatePicker}>
                         <Ionicons name="calendar-outline" size={24} color="#8B5CF6" />
                     </TouchableOpacity>
                 </View>
-
 
                 <OptionPicker
                     label="Categoria:"
                     options={CATEGORY_OPTIONS}
                     selectedValue={category}
-                    onSelect={setCategory as (v: string) => void}
-                />
-
+                    onSelect={setCategory as (v: string) => void}/>
+                
                 <Text style={styles.label}>Forma de Pagamento (Opcional):</Text>
                 <View style={styles.inputWrapper}>
                     <TextInput
@@ -265,8 +274,7 @@ const AddAssinatura = () => {
                         placeholderTextColor="#aaa"
                         style={styles.input}
                         value={paymentMethod}
-                        onChangeText={setPaymentMethod}
-                    />
+                        onChangeText={setPaymentMethod} />            
                 </View>
 
                 <TouchableOpacity onPress={handleAddSubscription} style={styles.buttonContainer}>
@@ -274,16 +282,28 @@ const AddAssinatura = () => {
                         colors={['#FF9800', '#8B5CF6', '#03A9F4']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
-                        style={styles.button}
-                    >
+                        style={styles.button}>
+                   
                         <Text style={styles.buttonText}>Adicionar Assinatura</Text>
                     </LinearGradient>
                 </TouchableOpacity>
 
+                <DateTimePickerModal
+                    isVisible={isDatePickerVisible}
+                    mode="date" 
+                    date={firstChargeDate} 
+                    onConfirm={handleConfirm}
+                    onCancel={hideDatePicker}
+                    headerTextIOS="Selecione a Data"
+                    cancelTextIOS="Cancelar"
+                    confirmTextIOS="Confirmar"
+                    pickerContainerStyleIOS={{ backgroundColor: '#282828' }}
+                    textColor="#fff"
+                />
             </ScrollView>
         </View>
     );
 };
 
 
-export default AddAssinatura;   
+export default AddAssinatura;
