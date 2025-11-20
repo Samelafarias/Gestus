@@ -76,9 +76,9 @@ export async function updateSubscription(updatedSubscription: Subscription): Pro
 
 /**
  * DELETE (Marcar como Inativa/Cancelada): Marca uma assinatura como inativa (Status = Inativa/Cancelada).
- * Nota: Conforme RF-1.4, vamos marcar como inativa em vez de remover totalmente.
+ * Conforme RF-1.4, vamos marcar como inativa em vez de remover totalmente.
  * @param {string} id - ID da assinatura a ser removida/inativada.
-
+ */ // <--- Certifique-se de que o JSDoc está fechado AQUI.
 export async function removeSubscription(id: string): Promise<void> {
   const subscriptions = await getSubscriptions();
   const index = subscriptions.findIndex(sub => sub.id === id);
