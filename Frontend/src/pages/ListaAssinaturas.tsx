@@ -45,8 +45,11 @@ const cardStyles = StyleSheet.create({
         marginBottom: 10,
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderLeftWidth: 5, 
-        borderLeftColor: '#8B5CF6', 
+        borderColor: '#adabab2e',
+        borderLeftWidth: 2, 
+        borderRightWidth: 2,
+        borderTopWidth: 2,
+        borderBottomWidth: 2,
     },
     detailsContainer: {
         flexDirection: 'row',
@@ -83,7 +86,7 @@ const cardStyles = StyleSheet.create({
     },
     valueText: {
         fontSize: 16,
-        color: '#FF9800',
+        color: '#fff',
         fontWeight: 600,
         marginBottom: 5,
     },
@@ -181,7 +184,7 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription }) => 
                     </TouchableOpacity>
                     
                     <TouchableOpacity onPress={handleRemove} style={cardStyles.actionButton}>
-                        <Ionicons name="trash-outline" size={20} color="#FF5252" />
+                        <Ionicons name="trash-outline" size={20} color="#ff6200ff" />
                     </TouchableOpacity>
                 </View>
             </View>
