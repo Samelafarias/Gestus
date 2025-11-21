@@ -86,8 +86,8 @@ const cardStyles = StyleSheet.create({
     },
     valueText: {
         fontSize: 16,
-        color: '#fff',
-        fontWeight: 600,
+        color: '#FFF', 
+        fontWeight: '600',
         marginBottom: 5,
     },
     actionButtons: {
@@ -124,7 +124,6 @@ interface SubscriptionCardProps {
 const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription }) => {
     const navigation = useNavigation();
     const { remove } = useSubscriptions(); 
-    
     const nextChargeDate = subscription.firstChargeDate;
     const formattedDate = nextChargeDate.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' });
     const formattedValue = subscription.value.toFixed(2).replace('.', ',');
@@ -155,8 +154,8 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription }) => 
         );
     };
 
-    const handleEdit = () => {
-        navigation.navigate('EdicaoAssinaturas' as never); 
+   const handleEdit = () => {
+        navigation.navigate('EdicaoAssinaturas' as never, { subscriptionId: subscription.id } as never); 
     };
 
     return (
@@ -184,7 +183,7 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription }) => 
                     </TouchableOpacity>
                     
                     <TouchableOpacity onPress={handleRemove} style={cardStyles.actionButton}>
-                        <Ionicons name="trash-outline" size={20} color="#ff6200ff" />
+                        <Ionicons name="trash-outline" size={20} color="#FF9800" /> 
                     </TouchableOpacity>
                 </View>
             </View>

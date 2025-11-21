@@ -63,17 +63,7 @@ export default function DrawerStack() {
                     ),
                 }}
             />
-            <Drawer.Screen 
-                name="EdicaoAssinaturas" 
-                 component={EdicaoAssinatura}
-                options={{
-                    drawerLabel: 'Edicao de Assinaturas', 
-                    title: 'Editar Assinatura',
-                    drawerIcon: ({ color, size }) => (
-                         <Ionicons name="pencil-outline" color={color} size={size} />
-                    ),
-                }}
-            />
+
        
             <Drawer.Screen 
                 name="AssinaturasInativas" 
@@ -90,7 +80,7 @@ export default function DrawerStack() {
                 name="Relatorios" 
                  component={RelatorioPage}
                 options={{
-                    drawerLabel: 'Relatorios', 
+                    drawerLabel: 'Relatórios', 
                     title: 'Relatórios',
                     drawerIcon: ({ color, size }) => (
                          <Ionicons name="bar-chart-outline" color={color} size={size} />
@@ -101,7 +91,7 @@ export default function DrawerStack() {
                 name="HistoricoNotificacao" 
                  component={Notificacao}
                 options={{
-                    drawerLabel: 'HistoricoNotificacao', 
+                    drawerLabel: 'Histórico Notificações', 
                     title: 'Histórico de Notificações',
                     drawerIcon: ({ color, size }) => (
                          <Ionicons name="notifications-outline" color={color} size={size} />
@@ -112,7 +102,7 @@ export default function DrawerStack() {
                 name="Configuracoes" 
                  component={ConfiguracoesPage}
                 options={{
-                    drawerLabel: 'Configuracoes', 
+                    drawerLabel: 'Configurações', 
                     title: 'Configurações',
                     drawerIcon: ({ color, size }) => (
                          <Ionicons name="settings-outline" color={color} size={size} />
@@ -123,7 +113,7 @@ export default function DrawerStack() {
                 name="Sobre" 
                  component={SobrePage}
                 options={{
-                    drawerLabel: 'Sobre', 
+                    drawerLabel: 'Sobre / Ajuda', 
                     title: 'Sobre / Ajuda',
                     drawerIcon: ({ color, size }) => (
                          <Ionicons name="help-circle-outline" color={color} size={size} />

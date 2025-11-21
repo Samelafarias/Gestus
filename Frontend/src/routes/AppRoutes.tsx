@@ -6,9 +6,9 @@ import HomePage from '../pages/Home';
 import RegisterPage from '../pages/Cadastrar';
 import ResetPassword from '../pages/ResetPassword';
 import RedefinirSenha from '../pages/RedefinirSenha';
-import ListaAssinaturas from '../pages/ListaAssinaturas';
 import DrawerStack from './DrawerStack';
 import AddAssinatura from '../pages/AddAssinaruras';
+import EdicaoAssinatura from '../pages/EdicaoAssinaturas';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,7 +23,14 @@ export default function AppRoutes() {
         <Stack.Screen name="RedefinirSenha" component={RedefinirSenha} />       
         <Stack.Screen name="App" component={DrawerStack} options={{ headerShown: false }} />
         <Stack.Screen name='AddAssinatura' component={AddAssinatura} options={{presentation:'modal',  headerShown: false}} />
+        <Stack.Screen name="EdicaoAssinaturas" component={EdicaoAssinatura} options={{ title: 'Editar Assinatura',
+           presentation:'modal', headerShown: true, 
+           headerStyle: { 
+           backgroundColor: '#1e1e1e' 
+           },
+           headerTintColor: '#fff', }} />
       </Stack.Navigator>
+
     </NavigationContainer>
   );
 }
