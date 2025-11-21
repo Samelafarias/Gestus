@@ -1,16 +1,17 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Subscription } from '../types/Subscription';
-import * as SubscriptionStorage from '../services/SubscriptionStorage';
+import * as SubscriptionStorage from '../services/SubscriptionStorage'; 
+import { scheduleAllReminders } from '../services/NotificationService'; 
 
 interface SubscriptionContextType {
   subscriptions: Subscription[];
   activeSubscriptions: Subscription[];
   inactiveSubscriptions: Subscription[];
   isLoading: boolean;
-  loadSubscriptions: () => void;
+  loadSubscriptions: () => Promise<void>;
   add: (data: Omit<Subscription, 'id' | 'isActive'>) => Promise<void>;
   update: (data: Subscription) => Promise<void>;
-  remove: (id: string) => Promise<void>; // Inativar
+  remove: (id: string) => Promise<void>; 
   reactivate: (id: string) => Promise<void>;
 }
 
@@ -23,42 +24,40 @@ interface SubscriptionProviderProps {
 export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ children }) => {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Carrega os dados ao iniciar o app
   const loadSubscriptions = async () => {
     setIsLoading(true);
     const data = await SubscriptionStorage.getSubscriptions();
     setSubscriptions(data);
     setIsLoading(false);
+
+    await scheduleAllReminders(data);
   };
 
   useEffect(() => {
     loadSubscriptions();
-  }, []);
-
-  // --- Funções de Manipulação que chamam o Storage e atualizam o estado ---
-
+  }, [])
+  
   const add = async (data: Omit<Subscription, 'id' | 'isActive'>) => {
     await SubscriptionStorage.addSubscription(data);
-    loadSubscriptions(); // Recarrega os dados para atualizar o estado
+    await loadSubscriptions(); 
   };
 
   const update = async (data: Subscription) => {
     await SubscriptionStorage.updateSubscription(data);
-    loadSubscriptions();
+    await loadSubscriptions();
   };
 
   const remove = async (id: string) => {
     await SubscriptionStorage.removeSubscription(id);
-    loadSubscriptions();
+    await loadSubscriptions(); 
   };
 
   const reactivate = async (id: string) => {
       await SubscriptionStorage.reactivateSubscription(id);
-      loadSubscriptions();
+      await loadSubscriptions();
   };
 
-  // Filtros conforme RF-1.2 e RF-1.3
+  // Filtros
   const activeSubscriptions = subscriptions.filter(sub => sub.isActive);
   const inactiveSubscriptions = subscriptions.filter(sub => !sub.isActive);
 
