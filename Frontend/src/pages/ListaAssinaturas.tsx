@@ -51,10 +51,10 @@ const cardStyles = StyleSheet.create({
         borderTopWidth: 2,
         borderBottomWidth: 2,
     },
-    detailsContainer: {
+    detailsContainer: { 
         flexDirection: 'row',
         alignItems: 'center',
-        flex: 1,
+        flex: 1, 
     },
     iconWrapper: {
         width: 45,
@@ -86,7 +86,7 @@ const cardStyles = StyleSheet.create({
     },
     valueText: {
         fontSize: 16,
-        color: '#FFF', 
+        color: '#fff', 
         fontWeight: '600',
         marginBottom: 5,
     },
@@ -119,7 +119,6 @@ const getCategoryIcon = (category: Subscription['category'] | string) => {
 interface SubscriptionCardProps {
     subscription: Subscription;
 }
-
 
 const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription }) => {
     const navigation = useNavigation();
@@ -154,13 +153,19 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription }) => 
         );
     };
 
-   const handleEdit = () => {
+    const handleEdit = () => {
         navigation.navigate('EdicaoAssinaturas' as never, { subscriptionId: subscription.id } as never); 
+    };
+    const handleViewDetails = () => {
+        navigation.navigate('DetalhesAssinaturas' as never, { subscriptionId: subscription.id } as never);
     };
 
     return (
         <View style={cardStyles.card}>
-            <View style={cardStyles.detailsContainer}>
+            <TouchableOpacity 
+                style={cardStyles.detailsContainer}
+                onPress={handleViewDetails}
+            >
                 <View style={[cardStyles.iconWrapper, { borderColor: iconColor }]}>
                     <Ionicons name={iconName} size={30} color={iconColor} />
                 </View>
@@ -168,10 +173,10 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription }) => 
                 <View style={cardStyles.textContainer}>
                     <Text style={cardStyles.nameText}>{subscription.name}</Text>
                     <Text style={cardStyles.nextChargeText}>
-                       Próximo pagamento em {formattedDate}
+                        Próximo pagamento em {formattedDate}
                     </Text>
                 </View>
-            </View>
+            </TouchableOpacity>
 
             <View style={cardStyles.actionsContainer}>
                 <Text style={cardStyles.valueText}>R$ {formattedValue}</Text>
