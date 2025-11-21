@@ -24,10 +24,10 @@ const ConfiguracoesPage = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        Hello World! 🌎
+       🛠️ Página em construção. 🛠️
       </Text>
       <Text style={styles.subtitle}>
-        Página Home Carregada com Sucesso.
+        Tente novamente mais tarde!
       </Text>
     </View>
   );
