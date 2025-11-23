@@ -61,6 +61,7 @@ const ConfiguracoesPage = () => {
             <Ionicons name="people-outline" size={24} color="#8B5CF6" />
             <Text style={styles.actionText}>Editar Dados de Cadastro</Text>
         </View>
+        <Ionicons name="pencil-outline" size={24} color="#ccc" />
       </TouchableOpacity>
       
       <TouchableOpacity 
