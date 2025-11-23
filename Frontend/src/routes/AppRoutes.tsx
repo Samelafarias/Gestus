@@ -10,6 +10,8 @@ import DrawerStack from './DrawerStack';
 import AddAssinatura from '../pages/AddAssinaruras';
 import EdicaoAssinatura from '../pages/EdicaoAssinaturas';
 import DetalhesAssinaturas from '../pages/DetalhesAssinaturas'; 
+import EditarCadastroPage from '../pages/EditarCadastro'; 
+import DefinirMetasPage from '../pages/DefinirMetas';
 
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +47,26 @@ export default function AppRoutes() {
                 headerStyle: { 
                     backgroundColor: '#1e1e1e' 
                 },
+                headerTintColor: '#fff', 
+            }} 
+        />
+        <Stack.Screen 
+            name="EditarCadastro" 
+            component={EditarCadastroPage} 
+            options={{ 
+                title: 'Editar Dados de Cadastro', 
+                headerShown: true, 
+                headerStyle: { backgroundColor: '#1e1e1e' },
+                headerTintColor: '#fff', 
+            }} 
+        />
+        <Stack.Screen 
+            name="DefinirMetas" 
+            component={DefinirMetasPage} 
+            options={{ 
+                title: 'Definir Metas de Gastos', 
+                headerShown: true, 
+                headerStyle: { backgroundColor: '#1e1e1e' },
                 headerTintColor: '#fff', 
             }} 
         />

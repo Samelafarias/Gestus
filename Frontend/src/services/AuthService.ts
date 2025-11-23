@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // Chaves de armazenamento local
 const USER_KEY = '@Gestus:userCredentials';
 const LOGGED_IN_KEY = '@Gestus:isLoggedIn';
-const RECOVERY_TOKEN_KEY = '@Gestus:recoveryToken'; // Para armazenar o token/código
+const RECOVERY_TOKEN_KEY = '@Gestus:recoveryToken'; 
 
 export interface UserCredentials {
   name: string;
@@ -32,6 +32,28 @@ export async function saveUser(user: UserCredentials): Promise<void> {
   }
 }
 
+/**
+ *  Atualiza o nome, email e o hash da senha do usuário no armazenamento local.
+ * @param updatedData - Objeto contendo os campos a serem atualizados.
+ */
+export async function updateUser(updatedData: { name?: string, email?: string, passwordHash?: string }): Promise<void> {
+    const existingUser = await getStoredUser();
+
+    if (!existingUser) {
+        throw new Error("Nenhum usuário cadastrado para atualizar.");
+    }
+
+    // Mescla os dados existentes com os novos dados fornecidos
+    const mergedUser: UserCredentials = {
+        name: updatedData.name ?? existingUser.name,
+        email: updatedData.email ?? existingUser.email,
+        passwordHash: updatedData.passwordHash ?? existingUser.passwordHash,
+    };
+
+    await saveUser(mergedUser);
+}
+
+
 export async function setLoggedIn(isLoggedIn: boolean): Promise<void> {
     try {
         await AsyncStorage.setItem(LOGGED_IN_KEY, isLoggedIn ? 'true' : 'false');
@@ -52,7 +74,7 @@ export async function checkLoggedIn(): Promise<boolean> {
 // --- Funções de Recuperação de Senha (API Simulada) ---
 
 /**
- * SIMULAÇÃO DE API: Envia um código de redefinição por e-mail (Token).
+ * Envia um código de redefinição por e-mail (Token).
  * Em um app real, isso faria um POST para o backend.
  * @param email - E-mail do usuário.
  * @returns O token gerado (simulado).
@@ -64,20 +86,20 @@ export async function sendPasswordRecovery(email: string): Promise<{ token: stri
         return { token: null, error: "Usuário não encontrado." };
     }
 
-    // SIMULAÇÃO: Gera um token simples de 6 dígitos
+    // Gera um token simples de 6 dígitos
     const token = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Salva o token localmente para verificação posterior
     await AsyncStorage.setItem(RECOVERY_TOKEN_KEY, token);
 
-    // SIMULAÇÃO DE E-MAIL: Exibe o token no console para fins de teste
+    // Exibe o token no console para fins de teste
     console.log(`[API SIMULADA] Token de Recuperação para ${email}: ${token}`);
 
     return { token, error: null };
 }
 
 /**
- * SIMULAÇÃO DE API: Redefine a senha usando o token e a nova senha.
+ * Redefine a senha usando o token e a nova senha.
  * @param token - Token de recuperação enviado por e-mail (simulado).
  * @param newPassword - Nova senha.
  */
