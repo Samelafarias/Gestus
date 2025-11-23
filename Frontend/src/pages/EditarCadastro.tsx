@@ -162,8 +162,6 @@ const EditarCadastroPage = () => {
     
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.sectionTitle}>Editar Dados de Cadastro</Text>
-            
             <Text style={styles.label}>Nome:</Text>
             <View style={styles.inputWrapper}>
                  <Ionicons name="person-outline" size={22} style={styles.icon} />
