@@ -208,10 +208,10 @@ const ProgressBar: React.FC<{ progress: number }> = ({ progress }) => {
     const clampedProgress = Math.min(Math.max(progress, 0), 1);
     const widthPercentage = `${clampedProgress * 100}%`;
     
-    let barColor = '#4eefa4ff'; 
+    let barColor = '#22ed17ff'; 
 
     if (clampedProgress >= GOAL_WARNING_THRESHOLD) {
-        barColor = '#FF9800'; 
+        barColor = '#ff5900ff'; 
     } 
     if (clampedProgress >= 1) {
         barColor = '#FF5252'; 
@@ -284,7 +284,7 @@ const HomePage = () => {
                 statusColor = '#FF9800';
             } else {
                 statusMessage = "Dentro da meta";
-                statusColor = '#4eefa4ff';
+                statusColor = '#22ed17ff';
             }
 
             return {
