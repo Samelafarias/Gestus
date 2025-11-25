@@ -35,7 +35,7 @@ const homeStyles = StyleSheet.create({
     borderColor: '#3a3a3a',
   },
   cardGasto: {
-    padding: 20,
+    padding: 10,
     marginBottom: 20,
     alignItems: 'center', 
   },
