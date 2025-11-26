@@ -37,7 +37,7 @@ const AddButton: React.FC = () => {
 const styles = StyleSheet.create({
  fabContainer: {
    position: 'absolute',
-   bottom: 30,
+   bottom: 65,
    right: 30, 
    width: 60,
    height: 60,
