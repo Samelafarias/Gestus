@@ -12,6 +12,7 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'space-between',
     marginBottom: 10,
+    marginTop: 20,
 },
 headerText: {
     fontSize: 20,
