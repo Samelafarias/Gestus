@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvo
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import * as AuthStorage from '../services/AuthService'; // Importação do novo serviço
+import * as AuthStorage from '../services/AuthService'; 
 
 const styles = StyleSheet.create({
     container: {
@@ -89,7 +89,6 @@ const styles = StyleSheet.create({
     },
 });
 
-// Define o tipo para os parâmetros de rota, se necessário
 interface RedefinirSenhaRouteParams {
     userEmail?: string;
 }
@@ -97,14 +96,11 @@ interface RedefinirSenhaRouteParams {
 export default function RedefinirSenha() {
     const navigation = useNavigation();
     const route = useRoute();
-    const { userEmail } = route.params as RedefinirSenhaRouteParams; // Pega o e-mail passado
-
+    const { userEmail } = route.params as RedefinirSenhaRouteParams;
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-
-
-    const handleRedefinirSenha = async () => { // Função agora é assíncrona
+    const handleRedefinirSenha = async () => { 
        if (!password || !confirmPassword) {
           Alert.alert('Campos Obrigatórios', 'Por favor, preencha a nova senha e a confirmação.');
           return;
@@ -120,10 +116,9 @@ export default function RedefinirSenha() {
           return;
        }
 
-       // 1. Atualiza a senha no AsyncStorage
-       const success = await AuthStorage.updatePassword(password);
-       
-       if (success) {
+       try {
+            await AuthStorage.updateUser({ passwordHash: password }); 
+        
             Alert.alert(
                 'Sucesso!', 
                 'Sua senha foi redefinida com sucesso. Faça login para continuar.',
@@ -131,11 +126,11 @@ export default function RedefinirSenha() {
                    { 
                       text: "Fazer Login", 
                       onPress: () => navigation.navigate('Login') 
-
                    }
                 ]
              );
-       } else {
+       } catch (e) {
+            console.error("Erro ao redefinir a senha:", e);
             Alert.alert('Erro', 'Falha ao redefinir a senha. Tente novamente.');
        }
     };

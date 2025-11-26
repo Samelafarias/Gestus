@@ -33,8 +33,9 @@ export async function saveUser(user: UserCredentials): Promise<void> {
 }
 
 /**
- *  Atualiza o nome, email e o hash da senha do usuário no armazenamento local.
- * @param updatedData - Objeto contendo os campos a serem atualizados.
+ * ATUALIZADO: Atualiza o nome, email e o hash da senha do usuário no armazenamento local.
+ * Esta função mescla os dados existentes com os novos dados fornecidos.
+ * @param updatedData - Objeto contendo os campos a serem atualizados (name, email, passwordHash).
  */
 export async function updateUser(updatedData: { name?: string, email?: string, passwordHash?: string }): Promise<void> {
     const existingUser = await getStoredUser();
@@ -75,7 +76,7 @@ export async function checkLoggedIn(): Promise<boolean> {
 
 /**
  * Envia um código de redefinição por e-mail (Token).
- * Em um app real, isso faria um POST para o backend.
+ * Esta função deve ser chamada pela página ResetPassword.tsx.
  * @param email - E-mail do usuário.
  * @returns O token gerado (simulado).
  */
@@ -100,6 +101,7 @@ export async function sendPasswordRecovery(email: string): Promise<{ token: stri
 
 /**
  * Redefine a senha usando o token e a nova senha.
+ * Esta função deve ser chamada pela página RedefinirSenha.tsx.
  * @param token - Token de recuperação enviado por e-mail (simulado).
  * @param newPassword - Nova senha.
  */
