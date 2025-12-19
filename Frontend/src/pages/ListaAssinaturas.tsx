@@ -209,9 +209,7 @@ const ListaAssinaturas = () => {
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.headerTitle}>Minhas Assinaturas</Text>
-            
+        <View style={styles.container}>            
             {activeSubscriptions.length === 0 ? (
                 <Text style={styles.emptyText}>Você ainda não tem assinaturas ativas. Adicione uma para começar!</Text>
             ) : (
