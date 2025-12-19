@@ -43,16 +43,16 @@ logoutText: {
 const innerStyles = StyleSheet.create({
     gradientContainer: {
         flex: 1,
-        borderTopRightRadius: 30, 
-        borderBottomRightRadius: 30,
-        overflow: 'hidden', 
+        borderTopLeftRadius: 30, 
+        borderBottomLeftRadius: 30,
+        overflow: 'hidden',
     },
     innerWhiteView: {
         flex: 1,
         backgroundColor: '#fff',
         margin: 3, 
-        borderTopRightRadius: 28, 
-        borderBottomRightRadius: 28,
+        borderTopLeftRadius: 28, 
+        borderBottomLeftRadius: 28,
         overflow: 'hidden',
     },
 });

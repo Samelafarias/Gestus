@@ -10,7 +10,7 @@ import Notificacao from '../pages/HistoricoNotificacao';
 import ConfiguracoesPage from '../pages/Consfiguracoes';
 import SobrePage from '../pages/Sobre';
 import EdicaoAssinatura from '../pages/EdicaoAssinaturas';
-
+import { Image, View, TouchableOpacity } from 'react-native';
 
 const Drawer = createDrawerNavigator();
 
@@ -18,29 +18,46 @@ export default function DrawerStack() {
     return (
         <Drawer.Navigator 
             drawerContent={(props) => <CustomDrawerContent {...props} />}
-            
-            screenOptions={{
+            screenOptions={({ navigation }) => ({ // navigation aqui para abrir o drawer
                 drawerActiveTintColor: '#8B5CF6', 
                 drawerInactiveTintColor: '#1e1e1e',
-                drawerStyle: {
-                    width: '80%', 
-                    backgroundColor: '#fff', 
-                    borderTopRightRadius: 30,
-                    borderBottomRightRadius: 30,
-                    overflow: 'hidden', 
-                },
-
-                drawerLabelStyle: {
-                    marginLeft: 10, 
-                    fontWeight: '600',
-                    fontSize: 15,
-                },
-
+                drawerPosition: 'right',
                 headerShown: true,
                 headerStyle: { backgroundColor: '#1e1e1e' },
                 headerTintColor: '#fff',
-            }}
-        >
+                headerTitleAlign: 'center',
+
+                drawerStyle: {
+                width: '85%', 
+                backgroundColor: 'transparent', 
+                borderTopLeftRadius: 30,         // Alinhado com o componente
+                borderBottomLeftRadius: 30,      // Alinhado com o componente
+                borderTopRightRadius: 0,        // Remova arredondamentos do lado oposto
+                borderBottomRightRadius: 0,     // Remova arredondamentos do lado oposto
+                overflow: 'hidden', 
+    },
+
+                // Colocar a Logo do sistema do lado esquerdo
+                headerLeft: () => (
+                    <Image 
+                        source={require('../../assets/Logo.png')} // Caminho para sua logo
+                        style={{ width: 30, height: 30, marginLeft: 15, resizeMode: 'contain' }} 
+                    />
+                ),
+
+                // Coloca o menu hambúrguer do lado direito
+                headerRight: () => (
+                    <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                        <Ionicons 
+                            name="menu-outline" 
+                            size={30} 
+                            color="#fff" 
+                            style={{ marginRight: 15 }} 
+                        />
+                    </TouchableOpacity>
+                ),
+            })}
+>
             <Drawer.Screen 
                 name="HomePage" 
                 component={HomePage}
