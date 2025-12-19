@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons'; 
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSubscriptions } from '../context/SubscriptionContext';
 import { Subscription } from '../types/Subscription';
@@ -137,8 +137,8 @@ const InactiveSubscriptionItem: React.FC<InactiveSubscriptionItemProps> = ({ ite
         <TouchableOpacity 
           style={styles.reactivateButton} 
           onPress={handleReactivate}>
-          <Ionicons name="reload-circle-outline" size={24} color="#fff" />
-          <Text style={styles.reactivateButtonText}>Reativar</Text>
+          <MaterialIcons name="u-turn-right" color="#fff" size={24} style={{ transform: [{ rotate: '-90deg' }] }} />    
+        <Text style={styles.reactivateButtonText}>Reativar</Text>
         </TouchableOpacity>
       </LinearGradient>
     </View>
