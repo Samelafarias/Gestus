@@ -9,7 +9,7 @@ import { Subscription } from '../types/Subscription';
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1e1e1e', 
+        backgroundColor: '#1e1e1e',
         padding: 15,
     },
     loadingContainer: {
@@ -22,23 +22,77 @@ const styles = StyleSheet.create({
         color: '#fff',
         marginTop: 10,
     },
+    gradientBorder: {
+        padding: 2.5,
+        borderRadius: 13,
+        marginBottom: 15,
+    },
     headerCard: {
         backgroundColor: '#282828',
         padding: 20,
         borderRadius: 10,
-        marginBottom: 20,
         alignItems: 'center',
     },
     headerName: {
         fontSize: 24,
         fontWeight: 'bold',
         color: '#fff',
+        marginTop: 10,
         marginBottom: 5,
     },
     headerValue: {
         fontSize: 18,
-        color: '#fff', 
+        color: '#fff',
         fontWeight: '600',
+    },
+    headerDetail: {
+        fontSize: 18,
+        color: '#fff',
+        fontWeight: '600',
+        marginBottom: 15,
+        marginTop: 20,
+    },
+    statusItem: {
+        backgroundColor: '#232325',
+        padding: 20,
+        borderRadius: 20,
+        marginBottom: 15,
+        borderWidth: 1,
+        borderColor: '#333',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    statusTextContainer: {
+        flex: 1,
+    },
+    textStatusLabel: {
+        color: '#fff',
+        fontSize: 16,
+        marginBottom: 5,
+    },
+    textStatusPreco: {
+        color: '#fff',
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 5,
+    },
+    textStatusVencimento: {
+        color: '#ccc',
+        fontSize: 14,
+    },
+    payButtonGradient: {
+        borderRadius: 30,
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    payButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: '600',
+        marginRight: 10,
     },
     detailCard: {
         flexDirection: 'row',
@@ -48,6 +102,8 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 10,
         marginBottom: 10,
+        borderWidth: 1,
+        borderColor: '#ffffff10',
     },
     detailCardMultiline: {
         backgroundColor: '#282828',
@@ -69,7 +125,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#fff',
         marginTop: 5,
-        flexShrink: 1, 
     },
     editButtonContainer: {
         borderRadius: 25,
@@ -103,6 +158,23 @@ const styles = StyleSheet.create({
     }
 });
 
+type IconName = keyof typeof Ionicons.glyphMap;
+
+const getCategoryIcon = (category: string): { name: IconName; color: string } => {
+    switch (category) {
+        case 'Streaming':
+            return { name: 'tv-outline', color: '#03A9F4' };
+        case 'Música':
+            return { name: 'musical-notes-outline', color: '#FF9800' };
+        case 'Software':
+            return { name: 'code-slash-outline', color: '#8B5CF6' };
+        case 'Educação':
+            return { name: 'book-outline', color: '#4eefa4ff' };
+        default:
+            return { name: 'cube-outline', color: '#ccc' };
+    }
+};
+
 type RootStackParamList = {
     DetalhesAssinaturas: { subscriptionId: string };
 };
@@ -120,13 +192,13 @@ const DetalhesAssinaturas: React.FC = () => {
         if (!isLoading) {
             const foundSub = subscriptions.find(sub => sub.id === subscriptionId);
             setSubscription(foundSub || null);
-            
+
             if (!foundSub) {
-                Alert.alert("Erro", "Assinatura não encontrada ou removida.");
+                Alert.alert("Erro", "Assinatura não encontrada.");
                 navigation.goBack();
             }
         }
-    }, [subscriptions, subscriptionId, isLoading, navigation]);
+    }, [subscriptions, subscriptionId, isLoading]);
 
     const handleEdit = () => {
         navigation.navigate('EdicaoAssinaturas' as never, { subscriptionId: subscriptionId } as never);
@@ -134,7 +206,6 @@ const DetalhesAssinaturas: React.FC = () => {
 
     const handleRemove = () => {
         if (!subscription) return;
-        
         Alert.alert(
             "Inativar Assinatura",
             `Tem certeza que deseja inativar a assinatura "${subscription.name}"?`,
@@ -145,10 +216,9 @@ const DetalhesAssinaturas: React.FC = () => {
                     onPress: async () => {
                         try {
                             await remove(subscription.id);
-                            Alert.alert("Sucesso", `${subscription.name} foi inativada.`);
-                            navigation.goBack(); 
+                            navigation.goBack();
                         } catch (error) {
-                            Alert.alert("Erro", "Não foi possível inativar a assinatura.");
+                            Alert.alert("Erro", "Não foi possível inativar.");
                         }
                     },
                     style: "destructive"
@@ -161,42 +231,64 @@ const DetalhesAssinaturas: React.FC = () => {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#8B5CF6" />
-                <Text style={styles.loadingText}>Carregando detalhes...</Text>
+                <Text style={styles.loadingText}>Carregando...</Text>
             </View>
         );
     }
-    
-    const formattedDate = subscription.firstChargeDate.toLocaleDateString('pt-BR');
+
+    const categoryInfo = getCategoryIcon(subscription.category);
+    const formattedDate = new Date(subscription.firstChargeDate).toLocaleDateString('pt-BR');
     const formattedValue = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(subscription.value);
 
     return (
         <ScrollView style={styles.container}>
-            
-            <View style={styles.headerCard}>
-                <Text style={styles.headerName}>{subscription.name}</Text>
-                <Text style={styles.headerValue}>
-                    {formattedValue} / {subscription.recurrence}
-                </Text>
-            </View>
+            <LinearGradient
+                colors={['#FF9800', '#8B5CF6', '#03A9F4']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.gradientBorder}
+            >
+                <View style={styles.headerCard}>
+                    <Ionicons name={categoryInfo.name} size={40} color={categoryInfo.color} />
+                    <Text style={styles.headerName}>{subscription.name}</Text>
+                    <Text style={styles.headerValue}>
+                        {formattedValue} / {subscription.recurrence}
+                    </Text>
+                </View>
+            </LinearGradient>
 
+            <Text style={styles.headerDetail}>Detalhes da Assinatura</Text>
             <DetailItem title="Próxima Cobrança" value={formattedDate} icon="calendar-outline" />
-            <DetailItem title="Categoria" value={subscription.category} icon="bookmark-outline" />
-            <DetailItem 
-                title="Forma de Pagamento" 
-                value={subscription.paymentMethod || 'Não informada'} 
-                icon="card-outline" 
-            />
-            <DetailItem 
-                title="Início da Cobrança" 
-                value={formattedDate} 
-                icon="time-outline" 
-            />
+            <DetailItem title="Categoria" value={subscription.category} icon={categoryInfo.name} iconColor="#8B5CF6" />
+            <DetailItem title="Forma de Pagamento" value={subscription.paymentMethod || 'Não informada'} icon="card-outline" />
+            <DetailItem title="Início da Cobrança" value={formattedDate} icon="time-outline" />
+
+            <Text style={styles.headerDetail}>Status da Assinatura</Text>
+            <View style={styles.statusItem}>
+                <View style={styles.statusTextContainer}>
+                    <Text style={styles.textStatusLabel}>Fatura Atual</Text>
+                    <Text style={styles.textStatusPreco}>{formattedValue}</Text>
+                    <Text style={styles.textStatusVencimento}>Vence em {formattedDate}</Text>
+                </View>
+
+                <TouchableOpacity onPress={() => Alert.alert("Pagamento", "Redirecionando...")}>
+                    <LinearGradient
+                        colors={['#FF9800', '#A16AE8', '#03A9F4']}
+                        start={{ x: 0, y: 0.5 }}
+                        end={{ x: 1, y: 0.5 }}
+                        style={styles.payButtonGradient}
+                    >
+                        <Text style={styles.payButtonText}>Pagar Agora</Text>
+                        <Ionicons name="arrow-forward" size={18} color="#fff" />
+                    </LinearGradient>
+                </TouchableOpacity>
+            </View>
 
             <TouchableOpacity onPress={handleEdit} style={styles.editButtonContainer}>
                 <LinearGradient
                     colors={['#FF9800', '#8B5CF6', '#03A9F4']}
                     start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
+                    end={{ x: 1, y: 0 }}
                     style={styles.editButtonGradient}
                 >
                     <Ionicons name="pencil-outline" size={20} color="#fff" style={{ marginRight: 10 }} />
@@ -215,20 +307,19 @@ const DetalhesAssinaturas: React.FC = () => {
 interface DetailItemProps {
     title: string;
     value: string;
-    icon: keyof typeof Ionicons.glyphMap;
+    icon: IconName;
+    iconColor?: string;
     isMultiline?: boolean;
 }
 
-const DetailItem: React.FC<DetailItemProps> = ({ title, value, icon, isMultiline }) => (
+const DetailItem: React.FC<DetailItemProps> = ({ title, value, icon, iconColor, isMultiline }) => (
     <View style={isMultiline ? styles.detailCardMultiline : styles.detailCard}>
         <View style={styles.detailTitleRow}>
-            <Ionicons name={icon} size={20} color="#8B5CF6" />
+            <Ionicons name={icon} size={20} color={iconColor || "#8B5CF6"} />
             <Text style={styles.detailTitle}>{title}</Text>
         </View>
         <Text style={styles.detailValue}>{value}</Text>
     </View>
 );
-
-
 
 export default DetalhesAssinaturas;
