@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView, Alert,} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -214,8 +214,12 @@ const AddAssinatura = () => {
     };
 
 
-    return (
-        <View style={styles.container}>
+   return (
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            {/* O Header fica fixo no topo */}
             <View style={styles.header}>
                 <Text style={styles.title}>Adicionar Nova Assinatura</Text>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -223,6 +227,7 @@ const AddAssinatura = () => {
                 </TouchableOpacity>
             </View>
 
+            {/* O ScrollView envolve o conteúdo que pode rolar */}
             <ScrollView contentContainerStyle={styles.content}>
                 
                 <Text style={styles.label}>Nome da Assinatura:</Text>
@@ -232,7 +237,8 @@ const AddAssinatura = () => {
                         placeholderTextColor="#aaa"
                         style={styles.input}
                         value={name}
-                        onChangeText={setName} />               
+                        onChangeText={setName} 
+                    />                
                 </View>
 
                 <Text style={styles.label}>Valor (R$):</Text>
@@ -243,14 +249,16 @@ const AddAssinatura = () => {
                         style={styles.input}
                         value={value}
                         onChangeText={setValue}
-                        keyboardType={Platform.OS === 'android' ? 'numeric' : 'numbers-and-punctuation'}/>      
+                        keyboardType={Platform.OS === 'android' ? 'numeric' : 'numbers-and-punctuation'}
+                    />       
                 </View>
                 
                 <OptionPicker
                     label="Recorrência:"
                     options={RECURRENCE_OPTIONS}
                     selectedValue={recurrence}
-                    onSelect={setRecurrence as (v: string) => void}/>
+                    onSelect={setRecurrence as (v: string) => void}
+                />
                 
                 <Text style={styles.label}>Data da Primeira Cobrança:</Text>
                 <View style={styles.inputWrapper}>
@@ -267,7 +275,8 @@ const AddAssinatura = () => {
                     label="Categoria:"
                     options={CATEGORY_OPTIONS}
                     selectedValue={category}
-                    onSelect={setCategory as (v: string) => void}/>
+                    onSelect={setCategory as (v: string) => void}
+                />
                 
                 <Text style={styles.label}>Forma de Pagamento (Opcional):</Text>
                 <View style={styles.inputWrapper}>
@@ -276,7 +285,8 @@ const AddAssinatura = () => {
                         placeholderTextColor="#aaa"
                         style={styles.input}
                         value={paymentMethod}
-                        onChangeText={setPaymentMethod} />            
+                        onChangeText={setPaymentMethod} 
+                    />            
                 </View>
 
                 <TouchableOpacity onPress={handleAddSubscription} style={styles.buttonContainer}>
@@ -284,8 +294,8 @@ const AddAssinatura = () => {
                         colors={['#FF9800', '#8B5CF6', '#03A9F4']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
-                        style={styles.button}>
-                   
+                        style={styles.button}
+                    >
                         <Text style={styles.buttonText}>Adicionar Assinatura</Text>
                     </LinearGradient>
                 </TouchableOpacity>
@@ -303,7 +313,7 @@ const AddAssinatura = () => {
                     textColor="#fff"
                 />
             </ScrollView>
-        </View>
+        </KeyboardAvoidingView>
     );
 };
 
