@@ -1,7 +1,2 @@
-# Docs
-docs.txt
-projeto_ppdm.pdf
-
-#imgs
-Logo.png
-LogoComp.png
+node_modules
+.env
