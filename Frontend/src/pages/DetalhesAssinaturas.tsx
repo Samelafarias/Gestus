@@ -92,7 +92,6 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: '600',
-        marginRight: 10,
     },
     detailCard: {
         flexDirection: 'row',
@@ -126,20 +125,22 @@ const styles = StyleSheet.create({
         color: '#fff',
         marginTop: 5,
     },
-    editButtonContainer: {
-        borderRadius: 25,
-        overflow: 'hidden',
+    editButtonWrapper: {
         marginTop: 30,
         marginBottom: 15,
+        borderRadius: 25,
+        padding: 2, 
     },
-    editButtonGradient: {
+    editButtonInner: {
+        backgroundColor: '#fff', 
+        borderRadius: 23,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 15,
+        padding: 13,
     },
     buttonText: {
-        color: '#fff',
+        color: '#1e1e1e', 
         fontSize: 16,
         fontWeight: 'bold',
     },
@@ -162,16 +163,11 @@ type IconName = keyof typeof Ionicons.glyphMap;
 
 const getCategoryIcon = (category: string): { name: IconName; color: string } => {
     switch (category) {
-        case 'Streaming':
-            return { name: 'tv-outline', color: '#03A9F4' };
-        case 'Música':
-            return { name: 'musical-notes-outline', color: '#FF9800' };
-        case 'Software':
-            return { name: 'code-slash-outline', color: '#8B5CF6' };
-        case 'Educação':
-            return { name: 'book-outline', color: '#4eefa4ff' };
-        default:
-            return { name: 'cube-outline', color: '#ccc' };
+        case 'Streaming': return { name: 'tv-outline', color: '#03A9F4' };
+        case 'Música': return { name: 'musical-notes-outline', color: '#FF9800' };
+        case 'Software': return { name: 'code-slash-outline', color: '#8B5CF6' };
+        case 'Educação': return { name: 'book-outline', color: '#4eefa4ff' };
+        default: return { name: 'cube-outline', color: '#ccc' };
     }
 };
 
@@ -185,7 +181,7 @@ const DetalhesAssinaturas: React.FC = () => {
     const navigation = useNavigation();
     const { subscriptionId } = route.params;
 
-    const { subscriptions, isLoading, remove } = useSubscriptions();
+    const { subscriptions, isLoading, remove, pay } = useSubscriptions();
     const [subscription, setSubscription] = useState<Subscription | null>(null);
 
     useEffect(() => {
@@ -198,17 +194,27 @@ const DetalhesAssinaturas: React.FC = () => {
                 navigation.goBack();
             }
         }
-    }, [subscriptions, subscriptionId, isLoading]);
+    }, [subscriptions, subscriptionId, isLoading, navigation]);
 
     const handleEdit = () => {
-        navigation.navigate('EdicaoAssinaturas' as never, { subscriptionId: subscriptionId } as never);
+        navigation.navigate('EdicaoAssinaturas' as never, { subscriptionId } as never);
+    };
+
+    const handlePay = async () => {
+        if (!subscription) return;
+        try {
+            await pay(subscription.id);
+            Alert.alert("Sucesso", "Pagamento registrado!");
+        } catch (error) {
+            Alert.alert("Erro", "Não foi possível registrar o pagamento.");
+        }
     };
 
     const handleRemove = () => {
         if (!subscription) return;
         Alert.alert(
             "Inativar Assinatura",
-            `Tem certeza que deseja inativar a assinatura "${subscription.name}"?`,
+            `Tem certeza que deseja inativar "${subscription.name}"?`,
             [
                 { text: "Cancelar", style: "cancel" },
                 {
@@ -217,8 +223,8 @@ const DetalhesAssinaturas: React.FC = () => {
                         try {
                             await remove(subscription.id);
                             navigation.goBack();
-                        } catch (error) {
-                            Alert.alert("Erro", "Não foi possível inativar.");
+                        } catch {
+                            Alert.alert("Erro", "Não foi possível remover.");
                         }
                     },
                     style: "destructive"
@@ -231,7 +237,6 @@ const DetalhesAssinaturas: React.FC = () => {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#8B5CF6" />
-                <Text style={styles.loadingText}>Carregando...</Text>
             </View>
         );
     }
@@ -251,48 +256,42 @@ const DetalhesAssinaturas: React.FC = () => {
                 <View style={styles.headerCard}>
                     <Ionicons name={categoryInfo.name} size={40} color={categoryInfo.color} />
                     <Text style={styles.headerName}>{subscription.name}</Text>
-                    <Text style={styles.headerValue}>
-                        {formattedValue} / {subscription.recurrence}
-                    </Text>
+                    <Text style={styles.headerValue}>{formattedValue} / {subscription.recurrence}</Text>
                 </View>
             </LinearGradient>
 
-            <Text style={styles.headerDetail}>Detalhes da Assinatura</Text>
+            <Text style={styles.headerDetail}>Detalhes</Text>
             <DetailItem title="Próxima Cobrança" value={formattedDate} icon="calendar-outline" />
-            <DetailItem title="Categoria" value={subscription.category} icon={categoryInfo.name} iconColor="#8B5CF6" />
-            <DetailItem title="Forma de Pagamento" value={subscription.paymentMethod || 'Não informada'} icon="card-outline" />
-            <DetailItem title="Início da Cobrança" value={formattedDate} icon="time-outline" />
+            <DetailItem title="Forma de Pagamento" value={subscription.paymentMethod || 'Cartão'} icon="card-outline" />
 
-            <Text style={styles.headerDetail}>Status da Assinatura</Text>
             <View style={styles.statusItem}>
                 <View style={styles.statusTextContainer}>
                     <Text style={styles.textStatusLabel}>Fatura Atual</Text>
                     <Text style={styles.textStatusPreco}>{formattedValue}</Text>
-                    <Text style={styles.textStatusVencimento}>Vence em {formattedDate}</Text>
                 </View>
-
-                <TouchableOpacity onPress={() => Alert.alert("Pagamento", "Redirecionando...")}>
+                <TouchableOpacity onPress={handlePay}>
                     <LinearGradient
                         colors={['#FF9800', '#A16AE8', '#03A9F4']}
                         start={{ x: 0, y: 0.5 }}
                         end={{ x: 1, y: 0.5 }}
                         style={styles.payButtonGradient}
                     >
-                        <Text style={styles.payButtonText}>Pagar Agora</Text>
-                        <Ionicons name="arrow-forward" size={18} color="#fff" />
+                        <Text style={styles.payButtonText}>Fatura Paga</Text>
                     </LinearGradient>
                 </TouchableOpacity>
             </View>
 
-            <TouchableOpacity onPress={handleEdit} style={styles.editButtonContainer}>
+            <TouchableOpacity onPress={handleEdit}>
                 <LinearGradient
                     colors={['#FF9800', '#8B5CF6', '#03A9F4']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    style={styles.editButtonGradient}
+                    style={styles.editButtonWrapper}
                 >
-                    <Ionicons name="pencil-outline" size={20} color="#fff" style={{ marginRight: 10 }} />
-                    <Text style={styles.buttonText}>EDITAR ASSINATURA</Text>
+                    <View style={styles.editButtonInner}>
+                        <Ionicons name="pencil-outline" size={20} color="#8B5CF6" style={{ marginRight: 10 }} />
+                        <Text style={styles.buttonText}>EDITAR ASSINATURA</Text>
+                    </View>
                 </LinearGradient>
             </TouchableOpacity>
 
@@ -304,14 +303,7 @@ const DetalhesAssinaturas: React.FC = () => {
     );
 };
 
-interface DetailItemProps {
-    title: string;
-    value: string;
-    icon: IconName;
-    iconColor?: string;
-    isMultiline?: boolean;
-}
-
+// Componente Auxiliar DetailItem
 const DetailItem: React.FC<DetailItemProps> = ({ title, value, icon, iconColor, isMultiline }) => (
     <View style={isMultiline ? styles.detailCardMultiline : styles.detailCard}>
         <View style={styles.detailTitleRow}>
@@ -321,5 +313,13 @@ const DetailItem: React.FC<DetailItemProps> = ({ title, value, icon, iconColor, 
         <Text style={styles.detailValue}>{value}</Text>
     </View>
 );
+
+interface DetailItemProps {
+    title: string;
+    value: string;
+    icon: IconName;
+    iconColor?: string;
+    isMultiline?: boolean;
+}
 
 export default DetalhesAssinaturas;

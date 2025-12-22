@@ -104,3 +104,32 @@ export async function reactivateSubscription(id: string): Promise<void> {
         await saveSubscriptions(subscriptions);
     }
 }
+
+/**
+ * REGISTRAR PAGAMENTO: Atualiza a data da próxima cobrança para o mês seguinte
+ * e mantém o histórico se necessário.
+ * @param {string} id - ID da assinatura paga.
+ */
+export async function paySubscription(id: string): Promise<void> {
+  const subscriptions = await getSubscriptions();
+  const index = subscriptions.findIndex(sub => sub.id === id);
+
+  if (index > -1) {
+    const sub = subscriptions[index];
+    const nextDate = new Date(sub.firstChargeDate);
+    
+    // Avança a data baseada na recorrência (Mensal por padrão no protótipo)
+    if (sub.recurrence === 'Mensal') {
+      nextDate.setMonth(nextDate.getMonth() + 1);
+    } else if (sub.recurrence === 'Anual') {
+      nextDate.setFullYear(nextDate.getFullYear() + 1);
+    }
+
+    subscriptions[index] = {
+      ...sub,
+      firstChargeDate: nextDate,
+    };
+    
+    await saveSubscriptions(subscriptions);
+  }
+}

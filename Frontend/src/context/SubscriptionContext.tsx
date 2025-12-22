@@ -13,6 +13,7 @@ interface SubscriptionContextType {
   update: (data: Subscription) => Promise<void>;
   remove: (id: string) => Promise<void>; 
   reactivate: (id: string) => Promise<void>;
+  pay: (id: string) => Promise<void>;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
@@ -57,6 +58,11 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
       await loadSubscriptions();
   };
 
+  const pay = async (id: string) => {
+    await SubscriptionStorage.paySubscription(id);
+    await loadSubscriptions(); 
+};
+
   // Filtros
   const activeSubscriptions = subscriptions.filter(sub => sub.isActive);
   const inactiveSubscriptions = subscriptions.filter(sub => !sub.isActive);
@@ -71,7 +77,8 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
       add,
       update,
       remove,
-      reactivate
+      reactivate,
+      pay
     }}>
       {children}
     </SubscriptionContext.Provider>
