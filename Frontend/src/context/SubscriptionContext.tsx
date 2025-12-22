@@ -2,18 +2,21 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import { Subscription } from '../types/Subscription';
 import * as SubscriptionStorage from '../services/SubscriptionStorage'; 
 import { scheduleAllReminders } from '../services/NotificationService'; 
+import { getNotificationHistory, NotificationLog } from '../services/NotificationHistoryStorage';
 
 interface SubscriptionContextType {
   subscriptions: Subscription[];
   activeSubscriptions: Subscription[];
   inactiveSubscriptions: Subscription[];
+  notificationHistory: NotificationLog[]; 
   isLoading: boolean;
   loadSubscriptions: () => Promise<void>;
+  loadNotifications: () => Promise<void>; 
   add: (data: Omit<Subscription, 'id' | 'isActive'>) => Promise<void>;
   update: (data: Subscription) => Promise<void>;
   remove: (id: string) => Promise<void>; 
   reactivate: (id: string) => Promise<void>;
-  pay: (id: string) => Promise<void>;
+  pay: (id: string) => Promise<void>; 
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
@@ -24,19 +27,36 @@ interface SubscriptionProviderProps {
 
 export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ children }) => {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [notificationHistory, setNotificationHistory] = useState<NotificationLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Carrega o histórico de notificações real do storage 
+  const loadNotifications = async () => {
+    const history = await getNotificationHistory();
+    setNotificationHistory(history);
+  };
+
   const loadSubscriptions = async () => {
     setIsLoading(true);
-    const data = await SubscriptionStorage.getSubscriptions();
-    setSubscriptions(data);
-    setIsLoading(false);
-
-    await scheduleAllReminders(data);
+    try {
+      const data = await SubscriptionStorage.getSubscriptions();
+      setSubscriptions(data);
+      
+      // Sempre carrega as notificações junto com as assinaturas 
+      await loadNotifications();
+      
+      // Reagenda os alertas baseados nas datas atualizadas 
+      await scheduleAllReminders(data);
+    } catch (error) {
+      console.error("Erro ao carregar dados do Context:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     loadSubscriptions();
-  }, [])
+  }, []);
   
   const add = async (data: Omit<Subscription, 'id' | 'isActive'>) => {
     await SubscriptionStorage.addSubscription(data);
@@ -58,12 +78,20 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
       await loadSubscriptions();
   };
 
+  // Lógica de pagamento: atualiza a data no storage e recarrega o estado global 
   const pay = async (id: string) => {
-    await SubscriptionStorage.paySubscription(id);
-    await loadSubscriptions(); 
-};
+    try {
+      // Chama a função que criamos no SubscriptionStorage
+      await SubscriptionStorage.paySubscription(id);
+      // Recarrega assinaturas e histórico de notificações
+      await loadSubscriptions();
+    } catch (error) {
+      console.error("Erro ao processar pagamento no contexto:", error);
+      throw error;
+    }
+  };
 
-  // Filtros
+  // Filtros derivados do estado principal 
   const activeSubscriptions = subscriptions.filter(sub => sub.isActive);
   const inactiveSubscriptions = subscriptions.filter(sub => !sub.isActive);
 
@@ -72,8 +100,10 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
       subscriptions,
       activeSubscriptions,
       inactiveSubscriptions,
+      notificationHistory,
       isLoading,
       loadSubscriptions,
+      loadNotifications,
       add,
       update,
       remove,
