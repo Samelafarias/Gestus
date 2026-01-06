@@ -278,7 +278,7 @@ const AddAssinatura = () => {
                     onSelect={setCategory as (v: string) => void}
                 />
                 
-                <Text style={styles.label}>Forma de Pagamento (Opcional):</Text>
+             {/* <Text style={styles.label}>Forma de Pagamento (Opcional):</Text>
                 <View style={styles.inputWrapper}>
                     <TextInput
                         placeholder="Ex: Cartão de Crédito"
@@ -288,7 +288,7 @@ const AddAssinatura = () => {
                         onChangeText={setPaymentMethod} 
                     />            
                 </View>
-
+*/}
                 <TouchableOpacity onPress={handleAddSubscription} style={styles.buttonContainer}>
                     <LinearGradient
                         colors={['#FF9800', '#8B5CF6', '#03A9F4']}

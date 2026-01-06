@@ -253,7 +253,7 @@ const EdicaoAssinatura: React.FC = () => {
                             placeholderTextColor="#aaa"
                         />
                     </View>
-                    
+                    {/* 
                      <Text style={styles.label}>Forma de Pagamento (Opcional):</Text>
                      <View style={styles.inputWrapper}>
                         <TextInput
@@ -264,7 +264,7 @@ const EdicaoAssinatura: React.FC = () => {
                             placeholderTextColor="#aaa"
                         />
                     </View>
-
+*/}
                     <TouchableOpacity onPress={handleUpdate} disabled={isSaving} style={styles.buttonContainer}>
                          <LinearGradient
                             colors={['#FF9800', '#8B5CF6', '#03A9F4']}
