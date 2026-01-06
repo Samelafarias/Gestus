@@ -6,6 +6,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSubscriptions } from '../context/SubscriptionContext';
 import { Subscription } from '../types/Subscription';
 
+// Importando os novos componentes personalizados
+import { ModalSuccess } from '../components/ModalSuccess';
+import { ModalError } from '../components/ModalError';
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -17,10 +21,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#1e1e1e',
-    },
-    loadingText: {
-        color: '#fff',
-        marginTop: 10,
     },
     gradientBorder: {
         padding: 2.5,
@@ -182,7 +182,11 @@ const DetalhesAssinaturas: React.FC = () => {
     const { subscriptionId } = route.params;
 
     const { subscriptions, isLoading, remove, pay } = useSubscriptions();
+    
+    // 1. ESTADOS NO TOPO
     const [subscription, setSubscription] = useState<Subscription | null>(null);
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [showError, setShowError] = useState(false);
 
     useEffect(() => {
         if (!isLoading) {
@@ -196,18 +200,19 @@ const DetalhesAssinaturas: React.FC = () => {
         }
     }, [subscriptions, subscriptionId, isLoading, navigation]);
 
-    const handleEdit = () => {
-        navigation.navigate('EdicaoAssinaturas' as never, { subscriptionId } as never);
-    };
-
+    // 2. FUNÇÃO DE PAGAMENTO ÚNICA
     const handlePay = async () => {
         if (!subscription) return;
         try {
             await pay(subscription.id);
-            Alert.alert("Sucesso", "Pagamento registrado!");
+            setShowSuccess(true); // Dispara animação de sucesso
         } catch (error) {
-            Alert.alert("Erro", "Não foi possível registrar o pagamento.");
+            setShowError(true); // Dispara animação de erro
         }
+    };
+
+    const handleEdit = () => {
+        navigation.navigate('EdicaoAssinaturas' as never, { subscriptionId } as never);
     };
 
     const handleRemove = () => {
@@ -246,64 +251,79 @@ const DetalhesAssinaturas: React.FC = () => {
     const formattedValue = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(subscription.value);
 
     return (
-        <ScrollView style={styles.container}>
-            <LinearGradient
-                colors={['#FF9800', '#8B5CF6', '#03A9F4']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.gradientBorder}
-            >
-                <View style={styles.headerCard}>
-                    <Ionicons name={categoryInfo.name} size={40} color={categoryInfo.color} />
-                    <Text style={styles.headerName}>{subscription.name}</Text>
-                    <Text style={styles.headerValue}>{formattedValue} / {subscription.recurrence}</Text>
-                </View>
-            </LinearGradient>
-
-            <Text style={styles.headerDetail}>Detalhes</Text>
-            <DetailItem title="Próxima Cobrança" value={formattedDate} icon="calendar-outline" />
-            <DetailItem title="Forma de Pagamento" value={subscription.paymentMethod || 'Cartão'} icon="card-outline" />
-
-            <View style={styles.statusItem}>
-                <View style={styles.statusTextContainer}>
-                    <Text style={styles.textStatusLabel}>Fatura Atual</Text>
-                    <Text style={styles.textStatusPreco}>{formattedValue}</Text>
-                </View>
-                <TouchableOpacity onPress={handlePay}>
-                    <LinearGradient
-                        colors={['#FF9800', '#A16AE8', '#03A9F4']}
-                        start={{ x: 0, y: 0.5 }}
-                        end={{ x: 1, y: 0.5 }}
-                        style={styles.payButtonGradient}
-                    >
-                        <Text style={styles.payButtonText}>Fatura Paga</Text>
-                    </LinearGradient>
-                </TouchableOpacity>
-            </View>
-
-            <TouchableOpacity onPress={handleEdit}>
+        <View style={{ flex: 1 }}> 
+            <ScrollView style={styles.container}>
                 <LinearGradient
                     colors={['#FF9800', '#8B5CF6', '#03A9F4']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    style={styles.editButtonWrapper}
+                    style={styles.gradientBorder}
                 >
-                    <View style={styles.editButtonInner}>
-                        <Ionicons name="pencil-outline" size={20} color="#8B5CF6" style={{ marginRight: 10 }} />
-                        <Text style={styles.buttonText}>EDITAR ASSINATURA</Text>
+                    <View style={styles.headerCard}>
+                        <Ionicons name={categoryInfo.name} size={40} color={categoryInfo.color} />
+                        <Text style={styles.headerName}>{subscription.name}</Text>
+                        <Text style={styles.headerValue}>{formattedValue} / {subscription.recurrence}</Text>
                     </View>
                 </LinearGradient>
-            </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleRemove} style={styles.removeButton}>
-                <Ionicons name="trash-outline" size={20} color="#FF5252" style={{ marginRight: 10 }} />
-                <Text style={styles.removeButtonText}>REMOVER ASSINATURA</Text>
-            </TouchableOpacity>
-        </ScrollView>
+                <Text style={styles.headerDetail}>Detalhes</Text>
+                
+                <DetailItem title="Categoria" value={subscription.category} icon={categoryInfo.name} iconColor={categoryInfo.color='#8B5CF6'} />
+                <DetailItem title="Próxima Cobrança" value={formattedDate} icon="calendar-outline" />
+                
+                <DetailItem 
+                    title="Notas" 
+                    value={subscription.notes || "Nenhuma observação."} 
+                    icon="document-text-outline" 
+                    isMultiline={true} 
+                />
+
+                <Text style={styles.headerDetail}>Status do Pagamento</Text>
+                <View style={styles.statusItem}>
+                    <View style={styles.statusTextContainer}>
+                        <Text style={styles.textStatusLabel}>Fatura Atual</Text>
+                        <Text style={styles.textStatusPreco}>{formattedValue}</Text>
+                        <Text style={styles.textStatusVencimento}>Vence em {formattedDate}</Text>
+                    </View>
+                    <TouchableOpacity onPress={handlePay}>
+                        <LinearGradient
+                            colors={['#FF9800', '#A16AE8', '#03A9F4']}
+                            start={{ x: 0, y: 0.5 }}
+                            end={{ x: 1, y: 0.5 }}
+                            style={styles.payButtonGradient}
+                        >
+                            <Text style={styles.payButtonText}>Marcar como Paga</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity onPress={handleEdit}>
+                    <LinearGradient
+                        colors={['#FF9800', '#8B5CF6', '#03A9F4']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.editButtonWrapper}
+                    >
+                        <View style={styles.editButtonInner}>
+                            <Ionicons name="pencil-outline" size={20} color="#8B5CF6" style={{ marginRight: 10 }} />
+                            <Text style={styles.buttonText}>EDITAR ASSINATURA</Text>
+                        </View>
+                    </LinearGradient>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={handleRemove} style={styles.removeButton}>
+                    <Ionicons name="trash-outline" size={20} color="#FF5252" style={{ marginRight: 10 }} />
+                    <Text style={styles.removeButtonText}>REMOVER ASSINATURA</Text>
+                </TouchableOpacity>
+            </ScrollView>
+
+            {/* 3. MODAIS POSICIONADAS FORA DO SCROLLVIEW PARA EVITAR CONFLITOS */}
+            <ModalSuccess visible={showSuccess} onClose={() => setShowSuccess(false)} />
+            <ModalError visible={showError} onClose={() => setShowError(false)} />
+        </View>
     );
 };
 
-// Componente Auxiliar DetailItem
 const DetailItem: React.FC<DetailItemProps> = ({ title, value, icon, iconColor, isMultiline }) => (
     <View style={isMultiline ? styles.detailCardMultiline : styles.detailCard}>
         <View style={styles.detailTitleRow}>
