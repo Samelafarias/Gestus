@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView, Alert,} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Alert,} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -11,7 +11,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#1e1e1e', 
-        
     },
     header: {
         flexDirection: 'row',
@@ -48,6 +47,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         alignItems: 'center',
         height: 50,
+    },
+    inputWrapperMultiline: {
+        backgroundColor: '#282828',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        minHeight: 100,
+        alignItems: 'flex-start',
     },
     input: {
         flex: 1,
@@ -117,10 +124,8 @@ const pickerStyles = StyleSheet.create({
     },
 });
 
-
 const RECURRENCE_OPTIONS: Subscription['recurrence'][] = ['Mensal', 'Anual', 'Trimestral', 'Semestral'];
 const CATEGORY_OPTIONS: Subscription['category'][] = ['Streaming', 'Música', 'Software', 'Educação', 'Outros'];
-
 
 const OptionPicker: React.FC<{
     label: string;
@@ -198,12 +203,11 @@ const AddAssinatura = () => {
                 recurrence,
                 firstChargeDate,
                 category,
-                paymentMethod: paymentMethod || undefined,
+                paymentMethod: paymentMethod || 'Não informado',
                 notes: notes || undefined,
             };
 
             await add(newSubscription);
-
             Alert.alert('Sucesso', `${name} foi adicionada à sua lista de assinaturas!`);
             navigation.goBack(); 
 
@@ -213,13 +217,11 @@ const AddAssinatura = () => {
         }
     };
 
-
-   return (
+    return (
         <KeyboardAvoidingView
             style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-            {/* O Header fica fixo no topo */}
             <View style={styles.header}>
                 <Text style={styles.title}>Adicionar Nova Assinatura</Text>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -227,7 +229,6 @@ const AddAssinatura = () => {
                 </TouchableOpacity>
             </View>
 
-            {/* O ScrollView envolve o conteúdo que pode rolar */}
             <ScrollView contentContainerStyle={styles.content}>
                 
                 <Text style={styles.label}>Nome da Assinatura:</Text>
@@ -265,7 +266,6 @@ const AddAssinatura = () => {
                     <Text style={styles.inputDateDisplay}>
                        {formatDateInput(firstChargeDate)}
                     </Text>
-
                     <TouchableOpacity onPress={showDatePicker}>
                         <Ionicons name="calendar-outline" size={24} color="#8B5CF6" />
                     </TouchableOpacity>
@@ -277,18 +277,21 @@ const AddAssinatura = () => {
                     selectedValue={category}
                     onSelect={setCategory as (v: string) => void}
                 />
-                
-             {/* <Text style={styles.label}>Forma de Pagamento (Opcional):</Text>
-                <View style={styles.inputWrapper}>
+
+                {/* Campo de Notas/Observações adicionado */}
+                <Text style={styles.label}>Notas / Observações (Opcional):</Text>
+                <View style={styles.inputWrapperMultiline}>
                     <TextInput
-                        placeholder="Ex: Cartão de Crédito"
+                        placeholder="Adicione detalhes extras aqui..."
                         placeholderTextColor="#aaa"
-                        style={styles.input}
-                        value={paymentMethod}
-                        onChangeText={setPaymentMethod} 
+                        style={[styles.input, { textAlignVertical: 'top' }]}
+                        value={notes}
+                        onChangeText={setNotes}
+                        multiline={true}
+                        numberOfLines={4}
                     />            
                 </View>
-*/}
+
                 <TouchableOpacity onPress={handleAddSubscription} style={styles.buttonContainer}>
                     <LinearGradient
                         colors={['#FF9800', '#8B5CF6', '#03A9F4']}
@@ -316,6 +319,5 @@ const AddAssinatura = () => {
         </KeyboardAvoidingView>
     );
 };
-
 
 export default AddAssinatura;

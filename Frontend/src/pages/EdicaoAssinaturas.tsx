@@ -38,6 +38,15 @@ const styles = StyleSheet.create({
         height: 50,
         marginBottom: 10,
     },
+    inputWrapperMultiline: {
+        backgroundColor: '#282828',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        minHeight: 100,
+        alignItems: 'flex-start',
+        marginBottom: 10,
+    },
     input: {
         flex: 1,
         fontSize: 16,
@@ -109,7 +118,7 @@ const EdicaoAssinatura: React.FC = () => {
                 value: foundSub.value,
                 recurrence: foundSub.recurrence,
                 category: foundSub.category,
-                firstChargeDate: foundSub.firstChargeDate, 
+                firstChargeDate: new Date(foundSub.firstChargeDate), 
                 paymentMethod: foundSub.paymentMethod || '',
                 notes: foundSub.notes || '',
             });
@@ -119,7 +128,7 @@ const EdicaoAssinatura: React.FC = () => {
         }
     }, [subscriptions, subscriptionId, isLoading, navigation]);
 
-    const handleChange = useCallback((key: keyof Omit<FormState, 'value' | 'valueInput' | 'firstChargeDate'> | 'valueInput', value: string | Date | number) => {
+    const handleChange = useCallback((key: keyof Omit<FormState, 'value' | 'valueInput' | 'firstChargeDate'> | 'valueInput' | 'firstChargeDate', value: string | Date | number) => {
         if (!formData) return;
         if (key === 'valueInput') {
             const cleanValue = value.toString().replace(/[^0-9,]/g, '');
@@ -149,7 +158,11 @@ const EdicaoAssinatura: React.FC = () => {
         }
         setIsSaving(true);
         try {
-            await update({ ...formData, value: numericValue, isActive: currentSubscription.isActive });
+            await update({ 
+                ...formData, 
+                value: numericValue, 
+                isActive: currentSubscription.isActive 
+            });
             Alert.alert("Sucesso", "Assinatura atualizada!");
             navigation.goBack(); 
         } catch (error) {
@@ -162,19 +175,19 @@ const EdicaoAssinatura: React.FC = () => {
     const handleInactivate = () => {
         if (!currentSubscription) return;
         Alert.alert(
-            "Inativar Assinatura",
-            `Tem certeza que deseja inativar a assinatura "${currentSubscription.name}"?`,
+            "Excluir Assinatura",
+            `Tem certeza que deseja excluir a assinatura "${currentSubscription.name}"?`,
             [
                 { text: "Cancelar", style: "cancel" },
                 { 
-                    text: "Inativar", 
+                    text: "Excluir", 
                     onPress: async () => {
                         setIsSaving(true);
                         try {
                             await remove(currentSubscription.id); 
                             navigation.goBack(); 
                         } catch (error) {
-                            Alert.alert("Erro", "Erro ao inativar.");
+                            Alert.alert("Erro", "Erro ao excluir.");
                         } finally { setIsSaving(false); }
                     },
                     style: 'destructive'
@@ -196,7 +209,7 @@ const EdicaoAssinatura: React.FC = () => {
         <KeyboardAvoidingView 
             style={styles.mainContainer}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // Ajuste para não cobrir o input focado
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
         >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <ScrollView contentContainerStyle={styles.container}>
@@ -253,18 +266,21 @@ const EdicaoAssinatura: React.FC = () => {
                             placeholderTextColor="#aaa"
                         />
                     </View>
-                    {/* 
-                     <Text style={styles.label}>Forma de Pagamento (Opcional):</Text>
-                     <View style={styles.inputWrapper}>
+
+                    {/* Novo campo de Notas/Observações */}
+                    <Text style={styles.label}>Notas / Observações (Opcional):</Text>
+                    <View style={styles.inputWrapperMultiline}>
                         <TextInput
-                            style={styles.input}
-                            value={formData.paymentMethod}
-                            onChangeText={(text) => handleChange('paymentMethod', text)}
-                            placeholder="Ex: Cartão de Crédito"
+                            style={[styles.input, { textAlignVertical: 'top' }]}
+                            value={formData.notes}
+                            onChangeText={(text) => handleChange('notes', text)}
+                            placeholder="Adicione detalhes extras aqui..."
                             placeholderTextColor="#aaa"
+                            multiline={true}
+                            numberOfLines={4}
                         />
                     </View>
-*/}
+
                     <TouchableOpacity onPress={handleUpdate} disabled={isSaving} style={styles.buttonContainer}>
                          <LinearGradient
                             colors={['#FF9800', '#8B5CF6', '#03A9F4']}
