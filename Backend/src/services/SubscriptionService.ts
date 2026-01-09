@@ -90,4 +90,15 @@ export class SubscriptionService {
 
     return result.rows[0];
     }
+
+    async delete(id: string, userId: string) {
+        const query = 'DELETE FROM subscriptions WHERE id = $1 AND user_id = $2 RETURNING *';
+        const result = await pool.query(query, [id, userId]);
+
+        if (result.rows.length === 0) {
+            throw new Error('Assinatura não encontrada ou você não tem permissão para excluí-la.');
+        }
+
+        return { message: 'Assinatura excluída com sucesso.' };
+}
 }
