@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRouter from './routes/auth.routes';
 import subscriptionRouter from './routes/subscription.routes';
+import reportRouter from './routes/report.routes';
 
 dotenv.config();
 
@@ -10,6 +11,7 @@ const app = express();
 
 app.use(cors()); // Permite que o fornt acesse a api
 app.use(express.json()); // Permite que a api entenda o json no corpao das requisições
+app.use('/reports', reportRouter);
 
 // Rotas
 app.use('/auth', authRouter);
