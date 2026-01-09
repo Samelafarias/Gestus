@@ -11,5 +11,7 @@ subscriptionRouter.use(authMiddleware);
 
 subscriptionRouter.post('/', subscriptionController.create);
 subscriptionRouter.get('/', subscriptionController.list);
+subscriptionRouter.patch('/:id/status', subscriptionController.updateStatus);
+subscriptionRouter.patch('/:id/pay', subscriptionController.pay);
 
 export default subscriptionRouter;

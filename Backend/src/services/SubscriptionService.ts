@@ -1,4 +1,3 @@
-// src/services/SubscriptionService.ts
 import { v4 as uuidv4 } from 'uuid';
 import pool from '../database';
 import { SubscriptionModel } from '../models/Subscription';
@@ -27,4 +26,32 @@ export class SubscriptionService {
         const result = await pool.query(query, [userId]);
         return result.rows;
     }
+
+    async updateStatus(id: string, userId: string, isActive: boolean) {
+        const query = 'UPDATE subscriptions SET is_active = $1 WHERE id = $2 AND user_id = $3 RETURNING *';
+        const result = await pool.query(query, [isActive, id, userId]);
+        
+        if (result.rows.length === 0) throw new Error('Assinatura não encontrada.');
+        return result.rows[0];
+    }
+
+    async pay(id: string, userId: string) {
+    // Busca a assinatura atual
+        const subResult = await pool.query('SELECT * FROM subscriptions WHERE id = $1 AND user_id = $2', [id, userId]);
+        if (subResult.rows.length === 0) throw new Error('Assinatura não encontrada.');
+        
+        const sub = subResult.rows[0];
+        const nextDate = new Date(sub.first_charge_date);
+
+    // Lógica de recorrência (vinda do seu código original)
+        if (sub.recurrence === 'Mensal') nextDate.setMonth(nextDate.getMonth() + 1);
+        else if (sub.recurrence === 'Anual') nextDate.setFullYear(nextDate.getFullYear() + 1);
+        else if (sub.recurrence === 'Trimestral') nextDate.setMonth(nextDate.getMonth() + 3);
+        else if (sub.recurrence === 'Semestral') nextDate.setMonth(nextDate.getMonth() + 6);
+
+    // Atualiza no banco
+        const updateQuery = 'UPDATE subscriptions SET first_charge_date = $1, is_paid = true WHERE id = $2 RETURNING *';
+        const result = await pool.query(updateQuery, [nextDate, id]);
+        return result.rows[0];
+}
 }

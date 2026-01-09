@@ -25,4 +25,25 @@ export class SubscriptionController {
       return res.status(400).json({ error: error.message });
     }
   };
+
+  updateStatus = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { is_active } = req.body;
+    const subscription = await subscriptionService.updateStatus(id, req.user.id, is_active);
+    return res.json(subscription);
+  } catch (error: any) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
+  pay = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const subscription = await subscriptionService.pay(id, req.user.id);
+      return res.json(subscription);
+    } catch (error: any) {
+      return res.status(400).json({ error: error.message });
+    }
+  };
 }
