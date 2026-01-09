@@ -1,4 +1,3 @@
-// src/controllers/AuthController.ts
 import { Request, Response } from 'express';
 import { AuthService } from '../services/AuthService';
 
@@ -24,5 +23,25 @@ export class AuthController {
     } catch (error: any) {
       return res.status(401).json({ error: error.message });
     }
+  };
+
+  sendRecovery = async (req: Request, res: Response) => {
+    try {
+        const { email } = req.body;
+        const result = await authService.sendRecoveryToken(email);
+        return res.json(result);
+    } catch (error: any) {
+        return res.status(400).json({ error: error.message });
+    }
+};
+
+  resetPassword = async (req: Request, res: Response) => {
+      try {
+          const { email, token, newPassword } = req.body;
+          const result = await authService.resetPassword(email, token, newPassword);
+          return res.json(result);
+      } catch (error: any) {
+          return res.status(400).json({ error: error.message });
+      }
   };
 }
