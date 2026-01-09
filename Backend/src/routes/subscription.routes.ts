@@ -13,5 +13,6 @@ subscriptionRouter.post('/', subscriptionController.create);
 subscriptionRouter.get('/', subscriptionController.list);
 subscriptionRouter.patch('/:id/status', subscriptionController.updateStatus);
 subscriptionRouter.patch('/:id/pay', subscriptionController.pay);
+subscriptionRouter.put('/:id', subscriptionController.update);
 
 export default subscriptionRouter;
