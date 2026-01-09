@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRouter from './routes/auth.routes';
+import subscriptionRouter from './routes/subscription.routes';
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ app.use(express.json()); // Permite que a api entenda o json no corpao das requi
 
 // Rotas
 app.use('/auth', authRouter);
+app.use('/subscriptions', subscriptionRouter);
 
 const PORT = process.env.PORT || 3000;
 

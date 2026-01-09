@@ -16,4 +16,3 @@ export interface SubscriptionModel {
   is_paid: boolean;
   created_at: Date;
 }
-}
