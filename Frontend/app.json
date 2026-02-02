@@ -3,31 +3,40 @@
     "name": "Gestus",
     "slug": "Frontend",
     "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/Logo.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/Logo.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true
-    },
     "android": {
+      "package": "com.samelafarias.gestus", 
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/Logo.png",
         "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      }
     },
-    "web": {
-      "favicon": "./assets/Logo.png"
+    "ios": {
+      "bundleIdentifier": "com.samelafarias.gestus",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "plugins": [
-      "expo-font"
-    ]
+      "expo-font",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      "@react-native-firebase/crashlytics",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableProguardInReleaseBuilds": true,
+            "enableMinifyInReleaseBuilds": true
+          },
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "92f94c8d-1710-48de-9505-9f72c7da0416"
+      }
+    }
   }
 }

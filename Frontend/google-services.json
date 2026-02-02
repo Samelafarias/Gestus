@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "929381423762",
+    "project_id": "gestus-75217",
+    "storage_bucket": "gestus-75217.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:929381423762:android:eac3f9b38a69c50494644b",
+        "android_client_info": {
+          "package_name": "com.samelafarias.gestus"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1oAm0bKVTIux-qukBwXiw7hobSBBJDPo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
