@@ -10,10 +10,14 @@
     "splash": {
       "image": "./assets/Logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ffffff",
+      "googleServicesFile": "./google-services.json",
+      "package": "com.samelafarias.gestus"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "bundleIdentifier": "com.samelafarias.gestus"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,13 +25,32 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.samelafarias.gestus",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/Logo.png"
     },
     "plugins": [
-      "expo-font"
-    ]
+      "expo-font",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      "@react-native-firebase/crashlytics",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "5af85a28-d9f5-4ca9-a8da-bc4f18eb2328"
+      }
+    },
+    "owner": "samelafarias"
   }
 }
