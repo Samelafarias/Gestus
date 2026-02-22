@@ -4,15 +4,13 @@
     "slug": "Frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/Logo.png",
+    "icon": "./assets/LogoApp.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/Logo.png",
+      "image": "./assets/LogoApp.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff",
-      "googleServicesFile": "./google-services.json",
-      "package": "com.samelafarias.gestus"
+      "backgroundColor": "#000000" 
     },
     "ios": {
       "supportsTablet": true,
@@ -20,17 +18,16 @@
       "bundleIdentifier": "com.samelafarias.gestus"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/Logo.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
       "package": "com.samelafarias.gestus",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/LogoApp.png",
+        "backgroundColor": "#000000"
+      },
+      "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/Logo.png"
+      "favicon": "./assets/LogoApp.png"
     },
     "plugins": [
       "expo-font",
@@ -42,6 +39,11 @@
         {
           "ios": {
             "useFrameworks": "static"
+          },
+          "android": {
+            "extraMavenRepos": [
+              "https://www.jitpack.io"
+            ]
           }
         }
       ]
