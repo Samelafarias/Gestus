@@ -1,47 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    padding: 15,
-    backgroundColor: '#1e1e1e', 
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff', 
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  actionCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#282828',
-    padding: 20,
-    borderRadius: 10,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#3a3a3a',
-  },
-  actionRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      flex: 1,
-  },
-  actionText: {
-    fontSize: 16,
-    color: '#fff',
-    marginLeft: 15,
-    fontWeight: '600',
-  }
-});
+import { useTheme } from '../context/ThemeContext'; 
 
 const ConfiguracoesPage = () => {
   const navigation = useNavigation();
+  const { theme, toggleTheme } = useTheme(); // Consome o tema atual e a função de troca
 
   const handleNavigateToEditData = () => {
     navigation.navigate('EditarCadastro' as never);
@@ -51,26 +16,64 @@ const ConfiguracoesPage = () => {
     navigation.navigate('DefinirMetas' as never);
   };
 
+  // Estilos dinâmicos baseados no tema
+  const dynamicStyles = StyleSheet.create({
+    container: {
+      flexGrow: 1,
+      padding: 15,
+      backgroundColor: theme.background, 
+    },
+    actionCard: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      backgroundColor: theme.surface,
+      padding: 20,
+      borderRadius: 10,
+      marginBottom: 10,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    actionText: {
+      fontSize: 16,
+      color: theme.text,
+      marginLeft: 15,
+      fontWeight: '600',
+    }
+  });
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <TouchableOpacity 
-        style={styles.actionCard} 
-        onPress={handleNavigateToEditData}
-      >
-        <View style={styles.actionRow}>
-            <Ionicons name="people-outline" size={24} color="#8B5CF6" />
-            <Text style={styles.actionText}>Editar Dados de Cadastro</Text>
+    <ScrollView contentContainerStyle={dynamicStyles.container}>
+      {/* Card de Alternar Tema */}
+      <View style={dynamicStyles.actionCard}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+          <Ionicons 
+            name={theme.isDark ? "moon-outline" : "sunny-outline"} 
+            size={24} 
+            color={theme.primary} 
+          />
+          <Text style={dynamicStyles.actionText}>Modo Escuro</Text>
         </View>
-        <Ionicons name="pencil-outline" size={24} color="#ccc" />
+        <Switch 
+          value={theme.isDark} 
+          onValueChange={toggleTheme}
+          trackColor={{ false: "#767577", true: theme.primary }}
+          thumbColor={theme.isDark ? "#f4f3f4" : "#f4f3f4"}
+        />
+      </View>
+
+      <TouchableOpacity style={dynamicStyles.actionCard} onPress={handleNavigateToEditData}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+            <Ionicons name="people-outline" size={24} color={theme.primary} />
+            <Text style={dynamicStyles.actionText}>Editar Dados de Cadastro</Text>
+        </View>
+        <Ionicons name="pencil-outline" size={24} color={theme.textSecondary} />
       </TouchableOpacity>
       
-      <TouchableOpacity 
-        style={styles.actionCard} 
-        onPress={handleNavigateToSetGoals}
-      >
-        <View style={styles.actionRow}>
-            <Ionicons name="cash-outline" size={24} color="#3adc90ff" />
-            <Text style={styles.actionText}>Definir Metas de Gastos</Text>
+      <TouchableOpacity style={dynamicStyles.actionCard} onPress={handleNavigateToSetGoals}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+            <Ionicons name="cash-outline" size={24} color={theme.secondary} />
+            <Text style={dynamicStyles.actionText}>Definir Metas de Gastos</Text>
         </View>
       </TouchableOpacity>
 
@@ -78,7 +81,5 @@ const ConfiguracoesPage = () => {
     </ScrollView>
   );
 };
-
-
 
 export default ConfiguracoesPage;

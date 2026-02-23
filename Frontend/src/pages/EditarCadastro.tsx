@@ -4,66 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as AuthStorage from '../services/AuthService'; 
-
-const styles = StyleSheet.create({
-    container: {
-        flexGrow: 1,
-        padding: 20,
-        backgroundColor: '#1e1e1e', 
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#1e1e1e',
-    },
-    sectionTitle: {
-        fontSize: 26,
-        fontWeight: 'bold',
-        color: '#fff',
-        marginBottom: 30,
-        textAlign: 'center',
-    },
-    label: {
-        fontSize: 14,
-        color: '#ccc',
-        marginBottom: 5,
-        marginTop: 15,
-        fontWeight: '600',
-    },
-    inputWrapper: {
-        flexDirection: 'row',
-        backgroundColor: '#282828',
-        borderRadius: 10,
-        paddingHorizontal: 15,
-        alignItems: 'center',
-        height: 50,
-        marginBottom: 10,
-        borderWidth: 1,
-        borderColor: '#3a3a3a',
-    },
-    icon: {
-        marginRight: 10,
-        color: '#8B5CF6',
-    },
-    input: {
-        flex: 1,
-        fontSize: 16,
-        color: '#fff',
-    },
-    saveButton: {
-        borderRadius: 25,
-        paddingVertical: 15,
-        alignItems: 'center',
-        marginTop: 30,
-        overflow: 'hidden',
-    },
-    saveButtonText: {
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: 16,
-    },
-});
+import { useTheme } from '../context/ThemeContext'; // 1. Importar o hook de tema
 
 interface FormData {
     name: string;
@@ -75,6 +16,8 @@ interface FormData {
 
 const EditarCadastroPage = () => {
     const navigation = useNavigation();
+    const { theme } = useTheme(); // 2. Consumir o tema atual
+    
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [formData, setFormData] = useState<FormData>({
@@ -86,6 +29,60 @@ const EditarCadastroPage = () => {
     });
     
     const [passwordVisible, setPasswordVisible] = useState(false);
+
+    // 3. Criar os estilos dinâmicos baseados no tema
+    const styles = StyleSheet.create({
+        container: {
+            flexGrow: 1,
+            padding: 20,
+            backgroundColor: theme.background, 
+        },
+        loadingContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: theme.background,
+        },
+        label: {
+            fontSize: 14,
+            color: theme.textSecondary,
+            marginBottom: 5,
+            marginTop: 15,
+            fontWeight: '600',
+        },
+        inputWrapper: {
+            flexDirection: 'row',
+            backgroundColor: theme.surface,
+            borderRadius: 10,
+            paddingHorizontal: 15,
+            alignItems: 'center',
+            height: 50,
+            marginBottom: 10,
+            borderWidth: 1,
+            borderColor: theme.border,
+        },
+        icon: {
+            marginRight: 10,
+            color: theme.primary,
+        },
+        input: {
+            flex: 1,
+            fontSize: 16,
+            color: theme.text,
+        },
+        saveButton: {
+            borderRadius: 25,
+            paddingVertical: 15,
+            alignItems: 'center',
+            marginTop: 30,
+            overflow: 'hidden',
+        },
+        saveButtonText: {
+            color: '#fff',
+            fontWeight: 'bold',
+            fontSize: 16,
+        },
+    });
 
     useEffect(() => {
         const loadUserData = async () => {
@@ -111,6 +108,7 @@ const EditarCadastroPage = () => {
             return;
         }
 
+        // Simulação de verificação de senha (conforme sua lógica original)
         if (formData.currentPassword !== storedUser.passwordHash) {
             Alert.alert('Erro', 'A Senha Atual está incorreta.');
             return;
@@ -155,7 +153,7 @@ const EditarCadastroPage = () => {
     if (isLoading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#8B5CF6" />
+                <ActivityIndicator size="large" color={theme.primary} />
             </View>
         );
     }
@@ -170,7 +168,7 @@ const EditarCadastroPage = () => {
                     value={formData.name}
                     onChangeText={(text) => setFormData(prev => ({ ...prev, name: text }))}
                     placeholder="Seu nome"
-                    placeholderTextColor="#aaa"
+                    placeholderTextColor={theme.textSecondary}
                 />
             </View>
 
@@ -182,7 +180,7 @@ const EditarCadastroPage = () => {
                     value={formData.email}
                     onChangeText={(text) => setFormData(prev => ({ ...prev, email: text }))}
                     placeholder="Email"
-                    placeholderTextColor="#aaa"
+                    placeholderTextColor={theme.textSecondary}
                     keyboardType="email-address"
                     autoCapitalize="none"
                 />
@@ -196,14 +194,14 @@ const EditarCadastroPage = () => {
                     value={formData.currentPassword}
                     onChangeText={(text) => setFormData(prev => ({ ...prev, currentPassword: text }))}
                     placeholder="Senha Atual"
-                    placeholderTextColor="#aaa"
+                    placeholderTextColor={theme.textSecondary}
                     secureTextEntry={!passwordVisible}
                 />
                 <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
                     <Ionicons
                         name={passwordVisible ? 'eye-off' : 'eye'}
                         size={22}
-                        color="#777"
+                        color={theme.textSecondary}
                     />
                 </TouchableOpacity>
             </View>
@@ -216,7 +214,7 @@ const EditarCadastroPage = () => {
                     value={formData.newPassword}
                     onChangeText={(text) => setFormData(prev => ({ ...prev, newPassword: text }))}
                     placeholder="Nova Senha"
-                    placeholderTextColor="#aaa"
+                    placeholderTextColor={theme.textSecondary}
                     secureTextEntry={!passwordVisible}
                 />
             </View>
@@ -229,7 +227,7 @@ const EditarCadastroPage = () => {
                     value={formData.confirmNewPassword}
                     onChangeText={(text) => setFormData(prev => ({ ...prev, confirmNewPassword: text }))}
                     placeholder="Confirmar Senha"
-                    placeholderTextColor="#aaa"
+                    placeholderTextColor={theme.textSecondary}
                     secureTextEntry={!passwordVisible}
                 />
             </View>
@@ -253,7 +251,5 @@ const EditarCadastroPage = () => {
         </ScrollView>
     );
 };
-
-
 
 export default EditarCadastroPage;

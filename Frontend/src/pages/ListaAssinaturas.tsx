@@ -5,51 +5,51 @@ import { useNavigation } from '@react-navigation/native';
 import AddButton from '../components/AddButton';
 import { useSubscriptions } from '../context/SubscriptionContext'; 
 import { Subscription } from '../types/Subscription'; 
+import { useTheme } from '../context/ThemeContext'; // Importe o hook
 
-const styles = StyleSheet.create({
+// Função para gerar os estilos da estrutura da página
+const createStyles = (theme: any) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1e1e1e',
+        backgroundColor: theme.background,
         paddingHorizontal: 15,
         paddingTop: 15,
     },
     headerTitle: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#fff',
+        color: theme.text,
         marginBottom: 15,
     },
     listContent: {
         paddingBottom: 100,
     },
     loadingText: {
-        color: '#fff',
+        color: theme.text,
         textAlign: 'center',
         fontSize: 16,
         marginTop: 50,
     },
     emptyText: {
-        color: '#ccc',
+        color: theme.textSecondary,
         textAlign: 'center',
         fontSize: 16,
         marginTop: 50,
     }
 });
 
-const cardStyles = StyleSheet.create({
+// Função para gerar os estilos dos cards
+const createCardStyles = (theme: any) => StyleSheet.create({
     card: {
         flexDirection: 'row',
-        backgroundColor: '#282828',
+        backgroundColor: theme.surface,
         borderRadius: 15,
         padding: 15,
         marginBottom: 10,
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderColor: '#adabab2e',
-        borderLeftWidth: 2, 
-        borderRightWidth: 2,
-        borderTopWidth: 2,
-        borderBottomWidth: 2,
+        borderColor: theme.border,
+        borderWidth: 2,
     },
     detailsContainer: { 
         flexDirection: 'row',
@@ -62,7 +62,7 @@ const cardStyles = StyleSheet.create({
         borderRadius: 22.5,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#1e1e1e', 
+        backgroundColor: theme.background, 
         marginRight: 15,
         borderWidth: 1,
     },
@@ -72,12 +72,12 @@ const cardStyles = StyleSheet.create({
     },
     nameText: {
         fontSize: 16,
-        color: '#fff',
+        color: theme.text,
         fontWeight: 'bold',
     },
     nextChargeText: {
         fontSize: 12,
-        color: '#aaa',
+        color: theme.textSecondary,
         marginTop: 2,
     },
     actionsContainer: {
@@ -86,7 +86,7 @@ const cardStyles = StyleSheet.create({
     },
     valueText: {
         fontSize: 16,
-        color: '#fff', 
+        color: theme.text, 
         fontWeight: '600',
         marginBottom: 5,
     },
@@ -98,7 +98,6 @@ const cardStyles = StyleSheet.create({
         padding: 4,
     }
 });
-
 
 const getCategoryIcon = (category: Subscription['category'] | string) => {
     switch (category) {
@@ -118,11 +117,14 @@ const getCategoryIcon = (category: Subscription['category'] | string) => {
 
 interface SubscriptionCardProps {
     subscription: Subscription;
+    theme: any; // Recebe o tema por prop
 }
 
-const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription }) => {
+const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription, theme }) => {
     const navigation = useNavigation();
     const { remove } = useSubscriptions(); 
+    const cardStyles = createCardStyles(theme); // Gera os estilos do card
+
     const nextChargeDate = subscription.firstChargeDate;
     const formattedDate = nextChargeDate.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' });
     const formattedValue = subscription.value.toFixed(2).replace('.', ',');
@@ -133,10 +135,7 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription }) => 
             "Inativar Assinatura",
             `Tem certeza que deseja inativar a assinatura "${subscription.name}"?`,
             [
-                {
-                    text: "Cancelar",
-                    style: "cancel"
-                },
+                { text: "Cancelar", style: "cancel" },
                 {
                     text: "Inativar",
                     onPress: async () => {
@@ -167,7 +166,7 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription }) => 
                 onPress={handleViewDetails}
             >
                 <View style={[cardStyles.iconWrapper, { borderColor: iconColor }]}>
-                    <Ionicons name={iconName} size={30} color={iconColor} />
+                    <Ionicons name={iconName as any} size={25} color={iconColor} />
                 </View>
 
                 <View style={cardStyles.textContainer}>
@@ -182,9 +181,8 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription }) => 
                 <Text style={cardStyles.valueText}>R$ {formattedValue}</Text>
                 
                 <View style={cardStyles.actionButtons}>
-
                     <TouchableOpacity onPress={handleEdit} style={cardStyles.actionButton}>
-                        <Ionicons name="pencil-outline" size={20} color="#8B5CF6" />
+                        <Ionicons name="pencil-outline" size={20} color={theme.primary} />
                     </TouchableOpacity>
                     
                     <TouchableOpacity onPress={handleRemove} style={cardStyles.actionButton}>
@@ -199,6 +197,8 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription }) => 
 
 const ListaAssinaturas = () => {
     const { activeSubscriptions, isLoading } = useSubscriptions(); 
+    const { theme } = useTheme(); // Hook do tema
+    const styles = createStyles(theme); // Gera estilos dinâmicos
 
     if (isLoading) {
         return (
@@ -216,7 +216,7 @@ const ListaAssinaturas = () => {
                 <FlatList
                     data={activeSubscriptions}
                     keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => <SubscriptionCard subscription={item} />}
+                    renderItem={({ item }) => <SubscriptionCard subscription={item} theme={theme} />}
                     contentContainerStyle={styles.listContent}
                 />
             )}

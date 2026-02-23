@@ -9,55 +9,58 @@ import RelatorioPage from '../pages/Relatorios';
 import Notificacao from '../pages/HistoricoNotificacao';
 import ConfiguracoesPage from '../pages/Consfiguracoes';
 import SobrePage from '../pages/Sobre';
-import EdicaoAssinatura from '../pages/EdicaoAssinaturas';
-import { Image, View, TouchableOpacity } from 'react-native';
+import { Image, TouchableOpacity } from 'react-native';
+import { useTheme } from '../context/ThemeContext';
 
 const Drawer = createDrawerNavigator();
 
 export default function DrawerStack() {
+    const { theme } = useTheme();
+
     return (
         <Drawer.Navigator 
             drawerContent={(props) => <CustomDrawerContent {...props} />}
-            screenOptions={({ navigation }) => ({ // navigation aqui para abrir o drawer
+            screenOptions={({ navigation }) => ({
                 drawerActiveTintColor: '#8B5CF6', 
                 drawerInactiveTintColor: '#1e1e1e',
+                drawerStyle: {
+                    width: '85%', 
+                    backgroundColor: 'transparent', 
+                    overflow: 'hidden', 
+                },
+
                 drawerPosition: 'right',
                 headerShown: true,
-                headerStyle: { backgroundColor: '#1e1e1e' },
-                headerTintColor: '#fff',
+                
+                headerStyle: { 
+                    backgroundColor: theme.background,
+                    elevation: 0,
+                    shadowOpacity: 0,
+                    borderBottomWidth: 1,
+                    borderBottomColor: theme.border
+                },
+                headerTintColor: theme.text,
                 headerTitleAlign: 'center',
 
-                drawerStyle: {
-                width: '85%', 
-                backgroundColor: 'transparent', 
-                borderTopLeftRadius: 30,         // Alinhado com o componente
-                borderBottomLeftRadius: 30,      // Alinhado com o componente
-                borderTopRightRadius: 0,        // Remova arredondamentos do lado oposto
-                borderBottomRightRadius: 0,     // Remova arredondamentos do lado oposto
-                overflow: 'hidden', 
-    },
-
-                // Colocar a Logo do sistema do lado esquerdo
                 headerLeft: () => (
                     <Image 
-                        source={require('../../assets/Logo.png')} // Caminho para sua logo
+                        source={require('../../assets/Logo.png')}
                         style={{ width: 30, height: 30, marginLeft: 15, resizeMode: 'contain' }} 
                     />
                 ),
 
-                // Coloca o menu hambúrguer do lado direito
                 headerRight: () => (
                     <TouchableOpacity onPress={() => navigation.openDrawer()}>
                         <Ionicons 
                             name="menu-outline" 
                             size={30} 
-                            color="#fff" 
+                            color={theme.text} 
                             style={{ marginRight: 15 }} 
                         />
                     </TouchableOpacity>
                 ),
             })}
->
+        >
             <Drawer.Screen 
                 name="HomePage" 
                 component={HomePage}
@@ -71,7 +74,7 @@ export default function DrawerStack() {
             />
             <Drawer.Screen 
                 name="ListaAssinaturas" 
-                 component={ListaAssinaturas}
+                component={ListaAssinaturas}
                 options={{
                     drawerLabel: 'Lista de Assinaturas', 
                     title: 'Minhas Assinaturas',
@@ -80,11 +83,9 @@ export default function DrawerStack() {
                     ),
                 }}
             />
-
-       
             <Drawer.Screen 
                 name="AssinaturasInativas" 
-                 component={AssinaturasInativas}
+                component={AssinaturasInativas}
                 options={{
                     drawerLabel: 'Assinaturas Inativas', 
                     title: 'Assinaturas Inativas',
@@ -95,7 +96,7 @@ export default function DrawerStack() {
             />
             <Drawer.Screen 
                 name="Relatorios" 
-                 component={RelatorioPage}
+                component={RelatorioPage}
                 options={{
                     drawerLabel: 'Relatórios', 
                     title: 'Relatórios',
@@ -106,7 +107,7 @@ export default function DrawerStack() {
             />
             <Drawer.Screen 
                 name="HistoricoNotificacao" 
-                 component={Notificacao}
+                component={Notificacao}
                 options={{
                     drawerLabel: 'Histórico Notificações', 
                     title: 'Histórico de Notificações',
@@ -117,7 +118,7 @@ export default function DrawerStack() {
             />
             <Drawer.Screen 
                 name="Configuracoes" 
-                 component={ConfiguracoesPage}
+                component={ConfiguracoesPage}
                 options={{
                     drawerLabel: 'Configurações', 
                     title: 'Configurações',
@@ -128,7 +129,7 @@ export default function DrawerStack() {
             />
             <Drawer.Screen 
                 name="Sobre" 
-                 component={SobrePage}
+                component={SobrePage}
                 options={{
                     drawerLabel: 'Sobre / Ajuda', 
                     title: 'Sobre / Ajuda',
@@ -137,7 +138,6 @@ export default function DrawerStack() {
                     ),
                 }}
             />
-           
         </Drawer.Navigator>
     );
 }

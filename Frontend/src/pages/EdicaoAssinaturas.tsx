@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput,  StyleSheet, Alert, ScrollView, TouchableOpacity, ActivityIndicator, Platform, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import { View, Text, TextInput, StyleSheet, Alert, ScrollView, TouchableOpacity, ActivityIndicator, Platform, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient'; 
 import DateTimePickerModal from "react-native-modal-datetime-picker"; 
 import { useSubscriptions } from '../context/SubscriptionContext';
 import { Subscription } from '../types/Subscription';
+import { useTheme } from '../context/ThemeContext'; // 1. Importar o Hook
 
-const styles = StyleSheet.create({
+// 2. Mover estilos para uma função que recebe o tema
+const createStyles = (theme: any) => StyleSheet.create({
     mainContainer: {
         flex: 1,
-        backgroundColor: '#1e1e1e',
+        backgroundColor: theme.background,
     },
     container: {
         flexGrow: 1,
@@ -20,42 +22,46 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#1e1e1e', 
+        backgroundColor: theme.background, 
     },
     label: {
         fontSize: 14,
-        color: '#ccc', 
+        color: theme.textSecondary, 
         marginBottom: 5,
         marginTop: 15,
         fontWeight: '600',
     },
     inputWrapper: {
         flexDirection: 'row',
-        backgroundColor: '#282828', 
+        backgroundColor: theme.surface, 
         borderRadius: 10,
         paddingHorizontal: 15,
         alignItems: 'center',
         height: 50,
         marginBottom: 10,
+        borderWidth: 1,
+        borderColor: theme.border,
     },
     inputWrapperMultiline: {
-        backgroundColor: '#282828',
+        backgroundColor: theme.surface,
         borderRadius: 10,
         paddingHorizontal: 15,
         paddingVertical: 10,
         minHeight: 100,
         alignItems: 'flex-start',
         marginBottom: 10,
+        borderWidth: 1,
+        borderColor: theme.border,
     },
     input: {
         flex: 1,
         fontSize: 16,
-        color: '#fff', 
+        color: theme.text, 
     },
     dateDisplay: {
         flex: 1,
         fontSize: 16,
-        color: '#fff',
+        color: theme.text,
     },
     buttonContainer: {
         marginTop: 30,
@@ -102,6 +108,11 @@ const EdicaoAssinatura: React.FC = () => {
     const navigation = useNavigation();
     const { subscriptionId } = route.params;
     const { subscriptions, update, remove, isLoading } = useSubscriptions();
+    
+    // 3. Consumir o tema e gerar os estilos
+    const { theme } = useTheme();
+    const styles = createStyles(theme);
+
     const [currentSubscription, setCurrentSubscription] = useState<Subscription | null>(null);
     const [formData, setFormData] = useState<FormState | null>(null);
     const [isSaving, setIsSaving] = useState(false);
@@ -199,8 +210,8 @@ const EdicaoAssinatura: React.FC = () => {
     if (isLoading || !formData) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#8B5CF6" />
-                <Text style={{color: '#fff'}}>Carregando dados...</Text>
+                <ActivityIndicator size="large" color={theme.primary} />
+                <Text style={{color: theme.text}}>Carregando dados...</Text>
             </View>
         );
     }
@@ -221,7 +232,7 @@ const EdicaoAssinatura: React.FC = () => {
                             value={formData.name}
                             onChangeText={(text) => handleChange('name', text)}
                             placeholder="Ex: Netflix"
-                            placeholderTextColor="#aaa"
+                            placeholderTextColor={theme.textSecondary}
                         />
                     </View>
 
@@ -232,7 +243,7 @@ const EdicaoAssinatura: React.FC = () => {
                             value={formData.valueInput}
                             onChangeText={(text) => handleChange('valueInput', text)}
                             placeholder="Ex: 39,90"
-                            placeholderTextColor="#aaa"
+                            placeholderTextColor={theme.textSecondary}
                             keyboardType="numeric"
                         />
                     </View>
@@ -244,7 +255,7 @@ const EdicaoAssinatura: React.FC = () => {
                             value={formData.recurrence}
                             onChangeText={(text) => handleChange('recurrence', text as Subscription['recurrence'])}
                             placeholder="Mensal, Anual..."
-                            placeholderTextColor="#aaa"
+                            placeholderTextColor={theme.textSecondary}
                         />
                     </View>
 
@@ -252,7 +263,7 @@ const EdicaoAssinatura: React.FC = () => {
                     <View style={styles.inputWrapper}>
                          <Text style={styles.dateDisplay}>{formatDateInput(formData.firstChargeDate)}</Text>
                          <TouchableOpacity onPress={showDatePicker}>
-                             <Ionicons name="calendar-outline" size={24} color="#8B5CF6" />
+                             <Ionicons name="calendar-outline" size={24} color={theme.primary} />
                          </TouchableOpacity>
                     </View>
 
@@ -263,11 +274,10 @@ const EdicaoAssinatura: React.FC = () => {
                             value={formData.category}
                             onChangeText={(text) => handleChange('category', text as Subscription['category'])}
                             placeholder="Ex: Streaming, Educação"
-                            placeholderTextColor="#aaa"
+                            placeholderTextColor={theme.textSecondary}
                         />
                     </View>
 
-                    {/* Novo campo de Notas/Observações */}
                     <Text style={styles.label}>Notas / Observações (Opcional):</Text>
                     <View style={styles.inputWrapperMultiline}>
                         <TextInput
@@ -275,7 +285,7 @@ const EdicaoAssinatura: React.FC = () => {
                             value={formData.notes}
                             onChangeText={(text) => handleChange('notes', text)}
                             placeholder="Adicione detalhes extras aqui..."
-                            placeholderTextColor="#aaa"
+                            placeholderTextColor={theme.textSecondary}
                             multiline={true}
                             numberOfLines={4}
                         />
@@ -305,7 +315,7 @@ const EdicaoAssinatura: React.FC = () => {
                         date={formData.firstChargeDate} 
                         onConfirm={handleConfirmDate}
                         onCancel={hideDatePicker}
-                        textColor="#fff"
+                        textColor={theme.isDark ? "#fff" : "#000"}
                     />
                 </ScrollView>
             </TouchableWithoutFeedback>

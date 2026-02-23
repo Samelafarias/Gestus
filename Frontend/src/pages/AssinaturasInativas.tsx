@@ -5,18 +5,19 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSubscriptions } from '../context/SubscriptionContext';
 import { Subscription } from '../types/Subscription';
+import { useTheme } from '../context/ThemeContext';
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#1e1e1e',
+    backgroundColor: theme.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1e1e1e',
+    backgroundColor: theme.background,
   },
   emptyContainer: {
     flex: 1,
@@ -27,19 +28,19 @@ const styles = StyleSheet.create({
   emptyText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#666',
+    color: theme.textSecondary,
     textAlign: 'center',
   },
   listContent: {
     paddingBottom: 20,
   },
   itemContainer: {
-    backgroundColor: '#1e1e1e',
+    backgroundColor: theme.surface,
     padding: 15,
     marginVertical: 8,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#adabab2e',
+    borderColor: theme.border,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -51,17 +52,17 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color: theme.text,
   },
   itemRecurrence: {
     fontSize: 14,
-    color: '#ccc',
+    color: theme.textSecondary,
     marginTop: 2,
   },
   itemValue: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#ccc',
+    color: theme.textSecondary,
     marginTop: 4,
   },
   rightActions: {
@@ -98,14 +99,15 @@ const styles = StyleSheet.create({
   },
 });
 
-interface InactiveSubscriptionItemProps {
+const InactiveSubscriptionItem: React.FC<{
   item: Subscription;
   onReactivate: (id: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
-}
-
-const InactiveSubscriptionItem: React.FC<InactiveSubscriptionItemProps> = ({ item, onReactivate, onDelete }) => {
+  theme: any; // Recebe o tema por prop ou via hook interno
+}> = ({ item, onReactivate, onDelete, theme }) => {
   
+  const styles = createStyles(theme); // Gera os estilos para este item
+
   const handleReactivate = () => {
     Alert.alert("Reativar", `Deseja reativar "${item.name}"?`, [
       { text: "Cancelar", style: "cancel" },
@@ -156,6 +158,8 @@ const InactiveSubscriptionItem: React.FC<InactiveSubscriptionItemProps> = ({ ite
 
 const AssinaturasInativas: React.FC = () => {
   const { inactiveSubscriptions, isLoading, reactivate, removeDefinitive } = useSubscriptions();
+  const { theme } = useTheme();
+  const styles = createStyles(theme); 
 
   const handleReactivateSubscription = async (id: string) => {
     try {
@@ -178,7 +182,7 @@ const AssinaturasInativas: React.FC = () => {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={{ color: '#fff' }}>Carregando...</Text>
+        <Text style={{ color: theme.text }}>Carregando...</Text>
       </View>
     );
   }
@@ -187,7 +191,7 @@ const AssinaturasInativas: React.FC = () => {
     <View style={styles.container}>
       {inactiveSubscriptions.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name="checkmark-circle-outline" size={60} color="#666" />
+          <Ionicons name="checkmark-circle-outline" size={60} color={theme.textSecondary} />
           <Text style={styles.emptyText}>Nenhuma assinatura inativa.</Text>
         </View>
       ) : (
@@ -198,6 +202,7 @@ const AssinaturasInativas: React.FC = () => {
               item={item} 
               onReactivate={handleReactivateSubscription}
               onDelete={handleDeleteSubscription}
+              theme={theme}
             />
           )}
           keyExtractor={(item) => item.id}

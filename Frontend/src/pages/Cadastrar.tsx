@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView, Alert,} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import auth from '@react-native-firebase/auth';
+import { auth } from '../config/firebaseConfig';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import AuthService from '../services/AuthService';
 
 const styles = StyleSheet.create({
@@ -111,8 +112,9 @@ const styles = StyleSheet.create({
 });
 
 export default function RegisterPage() { 
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false); 
   
   const [nome, setNome] = useState(''); 
   const [email, setEmail] = useState('');
@@ -120,67 +122,76 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleRegister = async () => {
-  if (!nome || !email || !password || !confirmPassword) {
-    Alert.alert('Campos obrigatórios', 'Por favor, preencha todos os campos.');
-    return;
-  }
-
-  if (password !== confirmPassword) {
-    Alert.alert('Erro', 'As senhas não coincidem.');
-    return;
-  }
-
-  try {
-    const userCredential = await auth().createUserWithEmailAndPassword(email, password);
-    
-    await userCredential.user.updateProfile({
-      displayName: nome,
-    });
-
-    const user = userCredential.user;
-
-    await AuthService.saveUser({ 
-        name: nome, 
-        email: email, 
-        uid: user.uid 
-    });
-    await AuthService.setLoggedIn(true);
-
-    Alert.alert('Sucesso', 'Conta criada com sucesso!', [
-      { text: 'OK', onPress: () => navigation.navigate('App') } 
-    ]);
-    
-  } catch (error) {
-    if (error.code === 'auth/email-already-in-use') {
-      Alert.alert('Erro', 'Este e-mail já está em uso.');
-    } else if (error.code === 'auth/invalid-email') {
-      Alert.alert('Erro', 'O e-mail digitado é inválido.');
-    } else {
-      Alert.alert('Erro', 'Ocorreu um erro ao tentar cadastrar.');
+    if (!nome || !email || !password || !confirmPassword) {
+      Alert.alert('Campos obrigatórios', 'Por favor, preencha todos os campos.');
+      return;
     }
-    console.error(error);
-  }
-};
+
+    if (password !== confirmPassword) {
+      Alert.alert('Erro', 'As senhas não coincidem.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // 1. Cria o usuário usando a sintaxe modular
+      const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+      const user = userCredential.user;
+
+      // 2. Atualiza o perfil (nome) usando a função modular updateProfile
+      await updateProfile(user, {
+        displayName: nome,
+      });
+
+      // 3. Salva no seu serviço local
+      await AuthService.saveUser({ 
+          name: nome, 
+          email: user.email || email, 
+          uid: user.uid 
+      });
+      await AuthService.setLoggedIn(true);
+
+      Alert.alert('Sucesso', 'Conta criada com sucesso!', [
+        { text: 'OK', onPress: () => navigation.navigate('App') } 
+      ]);
+      
+    } catch (error: any) {
+      let errorMessage = 'Ocorreu um erro ao tentar cadastrar.';
+      
+      // Tratamento de erros modular
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'Este e-mail já está em uso.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'O e-mail digitado é inválido.';
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'A senha deve ter pelo menos 6 caracteres.';
+      }
+
+      Alert.alert('Erro', errorMessage);
+      console.error("Firebase Register Error:", error.code);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
           <Image
             source={require('../../assets/LogoComp.png')} 
             style={styles.logo}
             resizeMode="contain"
           />
-          
           <Text style={styles.subtitle}>Seu Gerenciador de assinaturas</Text>
         </View>
 
         <View style={styles.formContainer}>
           <Text style={styles.loginTitle}>Cadastrar</Text> 
-          
           
           <Text style={styles.label}>Nome:</Text>
           <View style={styles.inputWrapper}>
@@ -192,6 +203,7 @@ export default function RegisterPage() {
               value={nome}
               onChangeText={setNome}
               autoCapitalize="words" 
+              editable={!loading}
             />
           </View>
 
@@ -206,6 +218,7 @@ export default function RegisterPage() {
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              editable={!loading}
             />
           </View>
 
@@ -219,6 +232,7 @@ export default function RegisterPage() {
               style={styles.input}
               value={password}
               onChangeText={setPassword}
+              editable={!loading}
             />
             <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
               <Ionicons
@@ -239,33 +253,29 @@ export default function RegisterPage() {
               style={styles.input}
               value={confirmPassword} 
               onChangeText={setConfirmPassword} 
+              editable={!loading}
             />
-            
-            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-              <Ionicons
-                name={passwordVisible ? 'eye-off' : 'eye'}
-                size={22}
-                color="#777"
-              />
-            </TouchableOpacity>
           </View>
 
-          
-          <TouchableOpacity onPress={handleRegister}> 
+          <TouchableOpacity onPress={handleRegister} disabled={loading}> 
             <LinearGradient
-              colors={['#FF9800', '#8B5CF6', '#03A9F4']}
+              colors={loading ? ['#ccc', '#999'] : ['#FF9800', '#8B5CF6', '#03A9F4']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.registerButtonGradient} 
             >
-              <Text style={styles.registerButtonText}>Cadastre-se</Text>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.registerButtonText}>Cadastre-se</Text>
+              )}
             </LinearGradient>
           </TouchableOpacity>
 
-         
           <TouchableOpacity
             style={styles.loginLinkButton} 
             onPress={() => navigation.navigate('Login')} 
+            disabled={loading}
           >
             <LinearGradient
               colors={['#FF9800', '#8B5CF6', '#03A9F4']}

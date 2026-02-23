@@ -5,159 +5,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSubscriptions } from '../context/SubscriptionContext';
 import { Subscription } from '../types/Subscription';
+import { useTheme } from '../context/ThemeContext'; 
 
 // Importando os novos componentes personalizados
 import { ModalSuccess } from '../components/ModalSuccess';
 import { ModalError } from '../components/ModalError';
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#1e1e1e',
-        padding: 15,
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#1e1e1e',
-    },
-    gradientBorder: {
-        padding: 2.5,
-        borderRadius: 13,
-        marginBottom: 15,
-    },
-    headerCard: {
-        backgroundColor: '#282828',
-        padding: 20,
-        borderRadius: 10,
-        alignItems: 'center',
-    },
-    headerName: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#fff',
-        marginTop: 10,
-        marginBottom: 5,
-    },
-    headerValue: {
-        fontSize: 18,
-        color: '#fff',
-        fontWeight: '600',
-    },
-    headerDetail: {
-        fontSize: 18,
-        color: '#fff',
-        fontWeight: '600',
-        marginBottom: 15,
-        marginTop: 20,
-    },
-    statusItem: {
-        backgroundColor: '#232325',
-        padding: 20,
-        borderRadius: 20,
-        marginBottom: 15,
-        borderWidth: 1,
-        borderColor: '#333',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    statusTextContainer: {
-        flex: 1,
-    },
-    textStatusLabel: {
-        color: '#fff',
-        fontSize: 16,
-        marginBottom: 5,
-    },
-    textStatusPreco: {
-        color: '#fff',
-        fontSize: 22,
-        fontWeight: 'bold',
-        marginBottom: 5,
-    },
-    textStatusVencimento: {
-        color: '#ccc',
-        fontSize: 14,
-    },
-    payButtonGradient: {
-        borderRadius: 30,
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    payButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    detailCard: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: '#282828',
-        padding: 15,
-        borderRadius: 10,
-        marginBottom: 10,
-        borderWidth: 1,
-        borderColor: '#ffffff10',
-    },
-    detailCardMultiline: {
-        backgroundColor: '#282828',
-        padding: 15,
-        borderRadius: 10,
-        marginBottom: 10,
-    },
-    detailTitleRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    detailTitle: {
-        fontSize: 14,
-        color: '#ccc',
-        marginLeft: 10,
-        fontWeight: 'bold',
-    },
-    detailValue: {
-        fontSize: 16,
-        color: '#fff',
-        marginTop: 5,
-    },
-    editButtonWrapper: {
-        marginTop: 30,
-        marginBottom: 15,
-        borderRadius: 25,
-        padding: 2, 
-    },
-    editButtonInner: {
-        backgroundColor: '#fff', 
-        borderRadius: 23,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 13,
-    },
-    buttonText: {
-        color: '#1e1e1e', 
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    removeButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 15,
-        marginBottom: 30,
-        borderRadius: 25,
-    },
-    removeButtonText: {
-        color: '#FF5252',
-        fontSize: 16,
-        fontWeight: 'bold',
-    }
-});
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -180,13 +32,167 @@ const DetalhesAssinaturas: React.FC = () => {
     const route = useRoute<DetalhesAssinaturasRouteProp>();
     const navigation = useNavigation();
     const { subscriptionId } = route.params;
+    const { theme } = useTheme(); // Consumindo o tema atual
 
     const { subscriptions, isLoading, remove, pay } = useSubscriptions();
     
-    // 1. ESTADOS NO TOPO
     const [subscription, setSubscription] = useState<Subscription | null>(null);
     const [showSuccess, setShowSuccess] = useState(false);
     const [showError, setShowError] = useState(false);
+
+    // ESTILOS DINÂMICOS
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: theme.background,
+            padding: 15,
+        },
+        loadingContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: theme.background,
+        },
+        gradientBorder: {
+            padding: 2.5,
+            borderRadius: 13,
+            marginBottom: 15,
+        },
+        headerCard: {
+            backgroundColor: theme.surface,
+            padding: 20,
+            borderRadius: 10,
+            alignItems: 'center',
+        },
+        headerName: {
+            fontSize: 24,
+            fontWeight: 'bold',
+            color: theme.text,
+            marginTop: 10,
+            marginBottom: 5,
+        },
+        headerValue: {
+            fontSize: 18,
+            color: theme.text,
+            fontWeight: '600',
+        },
+        headerDetail: {
+            fontSize: 18,
+            color: theme.text,
+            fontWeight: '600',
+            marginBottom: 15,
+            marginTop: 20,
+        },
+        statusItem: {
+            backgroundColor: theme.surface,
+            padding: 20,
+            borderRadius: 20,
+            marginBottom: 15,
+            borderWidth: 1,
+            borderColor: theme.border,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+        },
+        statusTextContainer: {
+            flex: 1,
+        },
+        textStatusLabel: {
+            color: theme.text,
+            fontSize: 16,
+            marginBottom: 5,
+        },
+        textStatusPreco: {
+            color: theme.text,
+            fontSize: 22,
+            fontWeight: 'bold',
+            marginBottom: 5,
+        },
+        textStatusVencimento: {
+            color: theme.textSecondary,
+            fontSize: 14,
+        },
+        payButtonGradient: {
+            borderRadius: 30,
+            paddingVertical: 12,
+            paddingHorizontal: 20,
+            flexDirection: 'row',
+            alignItems: 'center',
+        },
+        payButtonText: {
+            color: '#fff',
+            fontSize: 16,
+            fontWeight: '600',
+        },
+        detailCard: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            backgroundColor: theme.surface,
+            padding: 15,
+            borderRadius: 10,
+            marginBottom: 10,
+            borderWidth: 1,
+            borderColor: theme.border,
+        },
+        detailCardMultiline: {
+            backgroundColor: theme.surface,
+            padding: 15,
+            borderRadius: 10,
+            marginBottom: 10,
+            borderWidth: 1,
+            borderColor: theme.border,
+        },
+        detailTitleRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+        },
+        detailTitle: {
+            fontSize: 14,
+            color: theme.textSecondary,
+            marginLeft: 10,
+            fontWeight: 'bold',
+        },
+        detailValue: {
+            fontSize: 16,
+            color: theme.text,
+            marginTop: 5,
+        },
+        editButtonWrapper: {
+            marginTop: 30,
+            marginBottom: 15,
+            borderRadius: 25,
+            padding: 2, 
+        },
+        editButtonInner: {
+            backgroundColor: theme.isDark ? '#fff' : theme.surface, 
+            borderRadius: 23,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 13,
+            borderWidth: theme.isDark ? 0 : 1,
+            borderColor: theme.border,
+        },
+        buttonText: {
+            color: theme.isDark ? '#1e1e1e' : theme.text, 
+            fontSize: 16,
+            fontWeight: 'bold',
+        },
+        removeButton: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 15,
+            marginBottom: 30,
+            borderRadius: 25,
+        },
+        removeButtonText: {
+            color: '#FF5252',
+            fontSize: 16,
+            fontWeight: 'bold',
+        }
+    });
 
     useEffect(() => {
         if (!isLoading) {
@@ -200,14 +206,13 @@ const DetalhesAssinaturas: React.FC = () => {
         }
     }, [subscriptions, subscriptionId, isLoading, navigation]);
 
-    // 2. FUNÇÃO DE PAGAMENTO ÚNICA
     const handlePay = async () => {
         if (!subscription) return;
         try {
             await pay(subscription.id);
-            setShowSuccess(true); // Dispara animação de sucesso
+            setShowSuccess(true);
         } catch (error) {
-            setShowError(true); // Dispara animação de erro
+            setShowError(true);
         }
     };
 
@@ -241,7 +246,7 @@ const DetalhesAssinaturas: React.FC = () => {
     if (isLoading || !subscription) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#8B5CF6" />
+                <ActivityIndicator size="large" color={theme.primary} />
             </View>
         );
     }
@@ -250,8 +255,19 @@ const DetalhesAssinaturas: React.FC = () => {
     const formattedDate = new Date(subscription.firstChargeDate).toLocaleDateString('pt-BR');
     const formattedValue = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(subscription.value);
 
+    // Componente interno para os itens de detalhe respeitarem o tema
+    const DetailItem: React.FC<DetailItemProps> = ({ title, value, icon, iconColor, isMultiline }) => (
+        <View style={isMultiline ? styles.detailCardMultiline : styles.detailCard}>
+            <View style={styles.detailTitleRow}>
+                <Ionicons name={icon} size={20} color={iconColor || theme.primary} />
+                <Text style={styles.detailTitle}>{title}</Text>
+            </View>
+            <Text style={styles.detailValue}>{value}</Text>
+        </View>
+    );
+
     return (
-        <View style={{ flex: 1 }}> 
+        <View style={{ flex: 1, backgroundColor: theme.background }}> 
             <ScrollView style={styles.container}>
                 <LinearGradient
                     colors={['#FF9800', '#8B5CF6', '#03A9F4']}
@@ -268,8 +284,17 @@ const DetalhesAssinaturas: React.FC = () => {
 
                 <Text style={styles.headerDetail}>Detalhes</Text>
                 
-                <DetailItem title="Categoria" value={subscription.category} icon={categoryInfo.name} iconColor={categoryInfo.color='#8B5CF6'} />
-                <DetailItem title="Próxima Cobrança" value={formattedDate} icon="calendar-outline" />
+                <DetailItem 
+                    title="Categoria" 
+                    value={subscription.category} 
+                    icon={categoryInfo.name} 
+                    iconColor={categoryInfo.color} 
+                />
+                <DetailItem 
+                    title="Próxima Cobrança" 
+                    value={formattedDate} 
+                    icon="calendar-outline" 
+                />
                 
                 <DetailItem 
                     title="Notas" 
@@ -292,7 +317,7 @@ const DetalhesAssinaturas: React.FC = () => {
                             end={{ x: 1, y: 0.5 }}
                             style={styles.payButtonGradient}
                         >
-                            <Text style={styles.payButtonText}>Marcar como Paga</Text>
+                            <Text style={styles.payButtonText}>Pagar</Text>
                         </LinearGradient>
                     </TouchableOpacity>
                 </View>
@@ -305,7 +330,7 @@ const DetalhesAssinaturas: React.FC = () => {
                         style={styles.editButtonWrapper}
                     >
                         <View style={styles.editButtonInner}>
-                            <Ionicons name="pencil-outline" size={20} color="#8B5CF6" style={{ marginRight: 10 }} />
+                            <Ionicons name="pencil-outline" size={20} color={theme.isDark ? "#8B5CF6" : theme.primary} style={{ marginRight: 10 }} />
                             <Text style={styles.buttonText}>EDITAR ASSINATURA</Text>
                         </View>
                     </LinearGradient>
@@ -313,26 +338,15 @@ const DetalhesAssinaturas: React.FC = () => {
 
                 <TouchableOpacity onPress={handleRemove} style={styles.removeButton}>
                     <Ionicons name="trash-outline" size={20} color="#FF5252" style={{ marginRight: 10 }} />
-                    <Text style={styles.removeButtonText}>REMOVER ASSINATURA</Text>
+                    <Text style={styles.removeButtonText}>INATIVAR ASSINATURA</Text>
                 </TouchableOpacity>
             </ScrollView>
 
-            {/* 3. MODAIS POSICIONADAS FORA DO SCROLLVIEW PARA EVITAR CONFLITOS */}
             <ModalSuccess visible={showSuccess} onClose={() => setShowSuccess(false)} />
             <ModalError visible={showError} onClose={() => setShowError(false)} />
         </View>
     );
 };
-
-const DetailItem: React.FC<DetailItemProps> = ({ title, value, icon, iconColor, isMultiline }) => (
-    <View style={isMultiline ? styles.detailCardMultiline : styles.detailCard}>
-        <View style={styles.detailTitleRow}>
-            <Ionicons name={icon} size={20} color={iconColor || "#8B5CF6"} />
-            <Text style={styles.detailTitle}>{title}</Text>
-        </View>
-        <Text style={styles.detailValue}>{value}</Text>
-    </View>
-);
 
 interface DetailItemProps {
     title: string;

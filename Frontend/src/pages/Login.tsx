@@ -3,7 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvo
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import auth from '@react-native-firebase/auth';
+import { auth } from '../config/firebaseConfig'; 
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import AuthService from '../services/AuthService';
 
 const styles = StyleSheet.create({
@@ -116,47 +117,45 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Campos obrigatórios', 'Preencha o email e a senha.');
-      return;
+const handleLogin = async () => {
+  if (!email || !password) {
+    Alert.alert('Campos obrigatórios', 'Preencha o email e a senha.');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
+    const user = userCredential.user;
+
+    await AuthService.saveUser({
+      email: user.email,
+      uid: user.uid,
+      name: user.displayName || 'Usuário'
+    });
+    await AuthService.setLoggedIn(true);
+
+    navigation.navigate('App');
+
+  } catch (error: any) {
+    let errorMessage = 'Email ou senha incorretos.';
+    
+    // Tratamento de erros vindo do Firebase
+    if (error.code === 'auth/user-not-found') {
+      errorMessage = 'Usuário não encontrado.';
+    } else if (error.code === 'auth/wrong-password') {
+      errorMessage = 'Senha incorreta.';
+    } else if (error.code === 'auth/app-not-authorized') {
+      errorMessage = 'Erro de assinatura SHA-1. Verifique o Console Firebase.';
     }
 
-    setLoading(true);
-
-    try {
-      // 1. Autenticação no Firebase
-      const userCredential = await auth().signInWithEmailAndPassword(email.trim(), password);
-      const user = userCredential.user;
-
-      // 2. Sincronização com o armazenamento local (AsyncService)
-      await AuthService.saveUser({
-        email: user.email,
-        uid: user.uid,
-        name: user.displayName || 'Usuário'
-      });
-      await AuthService.setLoggedIn(true);
-
-      // 3. Redirecionamento
-      navigation.navigate('App');
-
-    } catch (error: any) {
-      let errorMessage = 'Email ou senha incorretos.';
-
-      if (error.code === 'auth/user-not-found') {
-        errorMessage = 'Usuário não encontrado. Cadastre-se primeiro.';
-      } else if (error.code === 'auth/wrong-password') {
-        errorMessage = 'Senha incorreta.';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'O formato do e-mail é inválido.';
-      }
-
-      Alert.alert('Erro', errorMessage);
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    Alert.alert('Erro', errorMessage);
+    console.error("Firebase Auth Error:", error.code, error.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <KeyboardAvoidingView
