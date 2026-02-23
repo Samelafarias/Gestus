@@ -3,6 +3,33 @@
     "name": "Gestus",
     "slug": "Frontend",
     "version": "1.0.0",
+  recuperacao-firebase
+    "orientation": "portrait",
+    "icon": "./assets/LogoApp.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/LogoApp.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000" 
+    },
+    "ios": {
+      "supportsTablet": true,
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "bundleIdentifier": "com.samelafarias.gestus"
+    },
+    "android": {
+      "package": "com.samelafarias.gestus",
+      "googleServicesFile": "./google-services.json",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/LogoApp.png",
+        "backgroundColor": "#000000"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/LogoApp.png"
+
     "android": {
       "package": "com.samelafarias.gestus", 
       "googleServicesFile": "./google-services.json",
@@ -14,6 +41,7 @@
     "ios": {
       "bundleIdentifier": "com.samelafarias.gestus",
       "googleServicesFile": "./GoogleService-Info.plist"
+   main
     },
     "plugins": [
       "expo-font",
@@ -23,20 +51,36 @@
       [
         "expo-build-properties",
         {
+   recuperacao-firebase
+          "ios": {
+            "useFrameworks": "static"
+          },
+          "android": {
+            "extraMavenRepos": [
+              "https://www.jitpack.io"
+            ]
           "android": {
             "enableProguardInReleaseBuilds": true,
             "enableMinifyInReleaseBuilds": true
           },
           "ios": {
             "useFrameworks": "static"
+     main
           }
         }
       ]
     ],
     "extra": {
       "eas": {
+   recuperacao-firebase
+        "projectId": "5af85a28-d9f5-4ca9-a8da-bc4f18eb2328"
+      }
+    },
+    "owner": "samelafarias"
+
         "projectId": "92f94c8d-1710-48de-9505-9f72c7da0416"
       }
     }
+     main
   }
 }

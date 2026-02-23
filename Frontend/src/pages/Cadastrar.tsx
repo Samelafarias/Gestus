@@ -3,7 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvo
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import * as AuthStorage from '../services/AuthService'; // Importação do novo serviço
+import auth from '@react-native-firebase/auth';
+import AuthService from '../services/AuthService';
 
 const styles = StyleSheet.create({
   container: {
@@ -118,39 +119,48 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleRegister = async () => { // Função agora é assíncrona
-    if (!nome || !email || !password || !confirmPassword) {
-      Alert.alert('Campos obrigatórios', 'Por favor, preencha todos os campos.');
-      return;
-    }
+  const handleRegister = async () => {
+  if (!nome || !email || !password || !confirmPassword) {
+    Alert.alert('Campos obrigatórios', 'Por favor, preencha todos os campos.');
+    return;
+  }
 
-    if (password !== confirmPassword) {
-      Alert.alert('Erro', 'As senhas não coincidem. Por favor, verifique.');
-      return;
-    }
+  if (password !== confirmPassword) {
+    Alert.alert('Erro', 'As senhas não coincidem.');
+    return;
+  }
+
+  try {
+    const userCredential = await auth().createUserWithEmailAndPassword(email, password);
     
-    // 1. Verifica se já existe um usuário (simulando que é um app de usuário único)
-    const storedUser = await AuthStorage.getStoredUser();
-    if (storedUser) {
-        Alert.alert('Erro', 'Já existe uma conta cadastrada neste dispositivo. Por favor, faça login.');
-        return;
-    }
+    await userCredential.user.updateProfile({
+      displayName: nome,
+    });
 
-    // 2. Salva o novo usuário no AsyncStorage
-    try {
-        await AuthStorage.saveUser({ 
-            name: nome, 
-            email: email, 
-            passwordHash: password // Salvando a senha pura, o que é inseguro, mas ok para este app offline
-        });
-        
-        Alert.alert('Sucesso', 'Cadastro realizado! Agora você pode fazer login.');
-        navigation.navigate('Login'); 
+    const user = userCredential.user;
 
-    } catch (e) {
-        Alert.alert('Erro', 'Falha ao salvar o cadastro no dispositivo.');
+    await AuthService.saveUser({ 
+        name: nome, 
+        email: email, 
+        uid: user.uid 
+    });
+    await AuthService.setLoggedIn(true);
+
+    Alert.alert('Sucesso', 'Conta criada com sucesso!', [
+      { text: 'OK', onPress: () => navigation.navigate('App') } 
+    ]);
+    
+  } catch (error) {
+    if (error.code === 'auth/email-already-in-use') {
+      Alert.alert('Erro', 'Este e-mail já está em uso.');
+    } else if (error.code === 'auth/invalid-email') {
+      Alert.alert('Erro', 'O e-mail digitado é inválido.');
+    } else {
+      Alert.alert('Erro', 'Ocorreu um erro ao tentar cadastrar.');
     }
-  };
+    console.error(error);
+  }
+};
 
   return (
     <KeyboardAvoidingView
