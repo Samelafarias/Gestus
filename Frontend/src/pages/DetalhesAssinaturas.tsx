@@ -5,8 +5,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSubscriptions } from '../context/SubscriptionContext';
 import { Subscription } from '../types/Subscription';
-
-// Importando os novos componentes personalizados
 import { ModalSuccess } from '../components/ModalSuccess';
 import { ModalError } from '../components/ModalError';
 

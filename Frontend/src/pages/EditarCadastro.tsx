@@ -1,69 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as AuthStorage from '../services/AuthService'; 
-
-const styles = StyleSheet.create({
-    container: {
-        flexGrow: 1,
-        padding: 20,
-        backgroundColor: '#1e1e1e', 
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#1e1e1e',
-    },
-    sectionTitle: {
-        fontSize: 26,
-        fontWeight: 'bold',
-        color: '#fff',
-        marginBottom: 30,
-        textAlign: 'center',
-    },
-    label: {
-        fontSize: 14,
-        color: '#ccc',
-        marginBottom: 5,
-        marginTop: 15,
-        fontWeight: '600',
-    },
-    inputWrapper: {
-        flexDirection: 'row',
-        backgroundColor: '#282828',
-        borderRadius: 10,
-        paddingHorizontal: 15,
-        alignItems: 'center',
-        height: 50,
-        marginBottom: 10,
-        borderWidth: 1,
-        borderColor: '#3a3a3a',
-    },
-    icon: {
-        marginRight: 10,
-        color: '#8B5CF6',
-    },
-    input: {
-        flex: 1,
-        fontSize: 16,
-        color: '#fff',
-    },
-    saveButton: {
-        borderRadius: 25,
-        paddingVertical: 15,
-        alignItems: 'center',
-        marginTop: 30,
-        overflow: 'hidden',
-    },
-    saveButtonText: {
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: 16,
-    },
-});
+import { useTheme } from '../context/ThemeContext'; // Importação do Tema
 
 interface FormData {
     name: string;
@@ -75,6 +16,8 @@ interface FormData {
 
 const EditarCadastroPage = () => {
     const navigation = useNavigation();
+    const { theme } = useTheme(); // Consumindo o tema global
+    
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [formData, setFormData] = useState<FormData>({
@@ -87,17 +30,84 @@ const EditarCadastroPage = () => {
     
     const [passwordVisible, setPasswordVisible] = useState(false);
 
+    // Estilos dinâmicos que mudam conforme o tema selecionado
+    const styles = useMemo(() => StyleSheet.create({
+        container: {
+            flexGrow: 1,
+            padding: 20,
+            backgroundColor: theme.background, 
+        },
+        loadingContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: theme.background,
+        },
+        sectionTitle: {
+            fontSize: 26,
+            fontWeight: 'bold',
+            color: theme.text,
+            marginBottom: 30,
+            textAlign: 'center',
+        },
+        label: {
+            fontSize: 14,
+            color: theme.text,
+            opacity: 0.7, // Simula o #ccc no dark e cinza no light
+            marginBottom: 5,
+            marginTop: 15,
+            fontWeight: '600',
+        },
+        inputWrapper: {
+            flexDirection: 'row',
+            backgroundColor: theme.surface,
+            borderRadius: 10,
+            paddingHorizontal: 15,
+            alignItems: 'center',
+            height: 50,
+            marginBottom: 10,
+            borderWidth: 1,
+            borderColor: theme.border,
+        },
+        icon: {
+            marginRight: 10,
+            color: theme.primary,
+        },
+        input: {
+            flex: 1,
+            fontSize: 16,
+            color: theme.text,
+        },
+        saveButton: {
+            borderRadius: 25,
+            paddingVertical: 15,
+            alignItems: 'center',
+            marginTop: 30,
+            overflow: 'hidden',
+        },
+        saveButtonText: {
+            color: '#fff', // Mantemos branco para destacar no degradê
+            fontWeight: 'bold',
+            fontSize: 16,
+        },
+    }), [theme]);
+
     useEffect(() => {
         const loadUserData = async () => {
-            const user = await AuthStorage.getStoredUser();
-            if (user) {
-                setFormData(prev => ({
-                    ...prev,
-                    name: user.name,
-                    email: user.email,
-                }));
+            try {
+                const user = await AuthStorage.getStoredUser();
+                if (user) {
+                    setFormData(prev => ({
+                        ...prev,
+                        name: user.name,
+                        email: user.email,
+                    }));
+                }
+            } catch (error) {
+                console.error("Erro ao carregar dados do usuário", error);
+            } finally {
+                setIsLoading(false);
             }
-            setIsLoading(false);
         };
         loadUserData();
     }, []);
@@ -111,6 +121,7 @@ const EditarCadastroPage = () => {
             return;
         }
 
+        // Validação básica da senha atual
         if (formData.currentPassword !== storedUser.passwordHash) {
             Alert.alert('Erro', 'A Senha Atual está incorreta.');
             return;
@@ -155,7 +166,7 @@ const EditarCadastroPage = () => {
     if (isLoading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#8B5CF6" />
+                <ActivityIndicator size="large" color={theme.primary} />
             </View>
         );
     }
@@ -170,7 +181,7 @@ const EditarCadastroPage = () => {
                     value={formData.name}
                     onChangeText={(text) => setFormData(prev => ({ ...prev, name: text }))}
                     placeholder="Seu nome"
-                    placeholderTextColor="#aaa"
+                    placeholderTextColor={theme.isDark ? "#777" : "#aaa"}
                 />
             </View>
 
@@ -182,7 +193,7 @@ const EditarCadastroPage = () => {
                     value={formData.email}
                     onChangeText={(text) => setFormData(prev => ({ ...prev, email: text }))}
                     placeholder="Email"
-                    placeholderTextColor="#aaa"
+                    placeholderTextColor={theme.isDark ? "#777" : "#aaa"}
                     keyboardType="email-address"
                     autoCapitalize="none"
                 />
@@ -196,14 +207,15 @@ const EditarCadastroPage = () => {
                     value={formData.currentPassword}
                     onChangeText={(text) => setFormData(prev => ({ ...prev, currentPassword: text }))}
                     placeholder="Senha Atual"
-                    placeholderTextColor="#aaa"
+                    placeholderTextColor={theme.isDark ? "#777" : "#aaa"}
                     secureTextEntry={!passwordVisible}
                 />
                 <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
                     <Ionicons
                         name={passwordVisible ? 'eye-off' : 'eye'}
                         size={22}
-                        color="#777"
+                        color={theme.text}
+                        style={{ opacity: 0.5 }}
                     />
                 </TouchableOpacity>
             </View>
@@ -215,8 +227,8 @@ const EditarCadastroPage = () => {
                     style={styles.input}
                     value={formData.newPassword}
                     onChangeText={(text) => setFormData(prev => ({ ...prev, newPassword: text }))}
-                    placeholder="Nova Senha"
-                    placeholderTextColor="#aaa"
+                    placeholder="Nova Senha (opcional)"
+                    placeholderTextColor={theme.isDark ? "#777" : "#aaa"}
                     secureTextEntry={!passwordVisible}
                 />
             </View>
@@ -228,15 +240,15 @@ const EditarCadastroPage = () => {
                     style={styles.input}
                     value={formData.confirmNewPassword}
                     onChangeText={(text) => setFormData(prev => ({ ...prev, confirmNewPassword: text }))}
-                    placeholder="Confirmar Senha"
-                    placeholderTextColor="#aaa"
+                    placeholder="Confirmar Nova Senha"
+                    placeholderTextColor={theme.isDark ? "#777" : "#aaa"}
                     secureTextEntry={!passwordVisible}
                 />
             </View>
 
             <TouchableOpacity onPress={handleSave} disabled={isSaving}>
                 <LinearGradient
-                    colors={['#FF9800', '#8B5CF6', '#03A9F4']}
+                    colors={['#FF9800', theme.primary, '#03A9F4']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.saveButton}
@@ -253,7 +265,5 @@ const EditarCadastroPage = () => {
         </ScrollView>
     );
 };
-
-
 
 export default EditarCadastroPage;
