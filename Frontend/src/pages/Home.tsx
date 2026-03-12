@@ -27,7 +27,7 @@ const getCategoryIconAndColor = (category: string) => {
         case 'Música': return { name: 'musical-notes-outline', color: '#FF9800' };
         case 'Software': return { name: 'code-slash-outline', color: '#8B5CF6' };
         case 'Educação': return { name: 'book-outline', color: '#4eefa4ff' };
-        default: return { name: 'cube-outline', color: '#ccc' };
+        default: return { name: 'cube-outline', color: '#797878' };
     }
 };
 
@@ -46,16 +46,27 @@ const getTimeUntilDueDate = (dueDate: Date): { text: string, color: string } => 
 };
 
 // Componente de Barra de Progresso Interno
-const ProgressBar: React.FC<{ progress: number }> = ({ progress }) => {
+const ProgressBar: React.FC<{ progress: number; isDark: boolean }> = ({ progress, isDark }) => {
     const clampedProgress = Math.min(Math.max(progress, 0), 1);
     const widthPercentage = `${clampedProgress * 100}%`;
-    let barColor = '#22ed17'; 
-    if (clampedProgress >= GOAL_WARNING_THRESHOLD) barColor = '#ff5900'; 
-    if (clampedProgress >= 1) barColor = '#FF5252'; 
+    
+    let barColor = '#22ed17'; // Verde padrão
+    if (clampedProgress >= GOAL_WARNING_THRESHOLD) barColor = '#ebc520'; // amarelo
+    if (clampedProgress >= 1) barColor = '#FF5252'; // Vermelho
 
     return (
-        <View style={{ height: 10, backgroundColor: '#444', borderRadius: 5, overflow: 'hidden', marginTop: 5 }}>
-            <View style={{ height: '100%', borderRadius: 5, width: widthPercentage as any, backgroundColor: barColor }} />
+        <View style={{ 
+            height: 8, 
+            backgroundColor: isDark ? '#333' : '#8d8b8b', // Fundo sutil no claro
+            borderRadius: 4, 
+            overflow: 'hidden', 
+            marginTop: 8 
+        }}>
+            <View style={{ 
+                height: '100%', 
+                width: widthPercentage as any, 
+                backgroundColor: barColor 
+            }} />
         </View>
     );
 };
@@ -256,7 +267,7 @@ const HomePage = () => {
                 statusColor = '#FF5252';
             } else if (progress >= GOAL_WARNING_THRESHOLD) {
                 statusMessage = "Quase no limite";
-                statusColor = '#FF9800';
+                statusColor = '#ebc520';
             }
 
             return { category, goal: goal.value, expense, progress, statusMessage, statusColor };
@@ -285,7 +296,7 @@ const HomePage = () => {
                     <View style={styles.cardGasto}>
                         <Text style={styles.mainValue}>{formatCurrency(summaryData.totalMonthlyExpense)}</Text>
                         <Text style={styles.cardTitleGasto}>Gasto Mensal Total</Text>
-                        <LinearGradient colors={['#FCA835', '#0AD1FA']} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={styles.gradientLine} />
+                        <LinearGradient colors={['#FCA835', '#8B5CF6','#0AD1FA']} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={styles.gradientLine} />
                     </View>
 
                     <Text style={styles.cardTitle}>Gastos e Metas por Categoria</Text>
