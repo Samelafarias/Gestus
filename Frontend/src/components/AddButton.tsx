@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     flex: 1, 
     width: '100%',
     height: '100%',
-    borderRadius: 30, 
+    borderRadius: 20, 
     justifyContent: 'center',
    alignItems: 'center',
   },
