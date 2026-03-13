@@ -4,15 +4,13 @@
     "slug": "Frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/Logo.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/LogoP.png", 
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/Logo.png",
+      "image": "./assets/LogoP.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff",
-      "googleServicesFile": "./google-services.json",
-      "package": "com.samelafarias.gestus"
+      "backgroundColor": "#1e1e1e"
     },
     "ios": {
       "supportsTablet": true,
@@ -21,16 +19,16 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/Logo.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/LogoP.png",
+        "backgroundColor": "#1e1e1e"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
       "package": "com.samelafarias.gestus",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/Logo.png"
+      "favicon": "./assets/LogoP.png"
     },
     "plugins": [
       "expo-font",
@@ -48,9 +46,15 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "5af85a28-d9f5-4ca9-a8da-bc4f18eb2328"
+        "projectId": "747a9267-3984-4bf5-8af0-bff947ba6014"
       }
     },
-    "owner": "samelafarias"
+    "owner": "samelafarias",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/747a9267-3984-4bf5-8af0-bff947ba6014"
+    }
   }
 }

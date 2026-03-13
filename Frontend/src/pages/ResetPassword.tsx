@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import {View, Text, TextInput, TouchableOpacity, StyleSheet, Image,  KeyboardAvoidingView, Platform, ScrollView, Alert,} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView, Alert, ActivityIndicator} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import * as AuthStorage from '../services/AuthService'; 
+import auth from '@react-native-firebase/auth'; // Importação direta do Firebase Auth
 
 const styles = StyleSheet.create({
   container: {
@@ -81,6 +81,8 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     alignItems: 'center',
     marginTop: 15, 
+    minHeight: 55,
+    justifyContent: 'center'
   },
   sendCodeText: { 
     color: '#fff',
@@ -92,39 +94,50 @@ const styles = StyleSheet.create({
 export default function ResetPassword() {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSendCode = async () => { 
+  const handleSendResetEmail = async () => { 
     if (!email) {
       Alert.alert('Campo Obrigatório', 'Por favor, insira seu e-mail para continuar.');
       return;
     }
     
-    if (!email.includes('@') || !email.includes('.')) {
-        Alert.alert('E-mail Inválido', 'Por favor, insira um e-mail válido.');
+    // Validação simples de formato de e-mail
+    const emailRegex = /\S+@\S+\.\S+/;
+    if (!emailRegex.test(email)) {
+        Alert.alert('E-mail Inválido', 'Por favor, insira um formato de e-mail válido.');
         return;
     }
-    
-    // 1. Verifica se o e-mail existe no AsyncStorage
-    const storedUser = await AuthStorage.getStoredUser();
-    
-    if (storedUser && storedUser.email === email) {
+
+    setLoading(true);
+
+    try {
+        // Chamada oficial ao Firebase para redefinição de senha
+        await auth().sendPasswordResetEmail(email.trim());
+        
         Alert.alert(
-            'E-mail Verificado', 
-            `E-mail encontrado. Redirecionando para a redefinição de senha.`,
+            'E-mail Enviado', 
+            `Um link para redefinir sua senha foi enviado para ${email}. Verifique sua caixa de entrada e spam.`,
             [
                 { 
                     text: "OK", 
-                    // Passa o e-mail como parâmetro para a próxima tela
-                    onPress: () => navigation.navigate('RedefinirSenha', { userEmail: email }) 
+                    onPress: () => navigation.navigate('Login') 
                 }
             ]
         );
-    } else {
-        // Mensagem de segurança: não revela se o e-mail existe ou não.
-        Alert.alert(
-            'E-mail Inválido', 
-            `O e-mail '${email}' não está cadastrado ou houve um erro.`
-        );
+    } catch (error: any) {
+        console.error(error);
+        
+        // Tratamento de erros específicos do Firebase
+        if (error.code === 'auth/user-not-found') {
+            Alert.alert('Erro', 'Não existe nenhum usuário cadastrado com este e-mail.');
+        } else if (error.code === 'auth/invalid-email') {
+            Alert.alert('Erro', 'O endereço de e-mail é inválido.');
+        } else {
+            Alert.alert('Erro', 'Ocorreu um erro ao tentar enviar o e-mail de recuperação. Tente novamente mais tarde.');
+        }
+    } finally {
+        setLoading(false);
     }
   };
 
@@ -145,8 +158,8 @@ export default function ResetPassword() {
 
         <View style={styles.formContainer}>
           <Text style={styles.loginTitle}>Recuperar Senha</Text>
-                    <Text style={styles.formSubtitle}>
-            Receba um código para redefinir sua conta por e-mail.
+          <Text style={styles.formSubtitle}>
+            Enviaremos um link seguro para o seu e-mail para que você possa redefinir sua senha.
           </Text>
 
           <Text style={styles.label}>Email:</Text>
@@ -160,17 +173,22 @@ export default function ResetPassword() {
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              editable={!loading}
             />
           </View>
 
-          <TouchableOpacity onPress={handleSendCode}>
+          <TouchableOpacity onPress={handleSendResetEmail} disabled={loading}>
             <LinearGradient
               colors={['#FF9800', '#8B5CF6', '#03A9F4']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.sendCodeButton}
             >
-              <Text style={styles.sendCodeText}>Enviar Código</Text>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.sendCodeText}>Enviar Link de Recuperação</Text>
+              )}
             </LinearGradient>
           </TouchableOpacity>
         </View>

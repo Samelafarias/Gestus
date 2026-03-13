@@ -1,193 +1,114 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, Alert, TouchableOpacity } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, Text, StyleSheet, FlatList, Alert, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AddButton from '../components/AddButton';
 import { useSubscriptions } from '../context/SubscriptionContext'; 
 import { Subscription } from '../types/Subscription'; 
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#1e1e1e',
-        paddingHorizontal: 15,
-        paddingTop: 15,
-    },
-    headerTitle: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: '#fff',
-        marginBottom: 15,
-    },
-    listContent: {
-        paddingBottom: 100,
-    },
-    loadingText: {
-        color: '#fff',
-        textAlign: 'center',
-        fontSize: 16,
-        marginTop: 50,
-    },
-    emptyText: {
-        color: '#ccc',
-        textAlign: 'center',
-        fontSize: 16,
-        marginTop: 50,
-    }
-});
-
-const cardStyles = StyleSheet.create({
-    card: {
-        flexDirection: 'row',
-        backgroundColor: '#282828',
-        borderRadius: 15,
-        padding: 15,
-        marginBottom: 10,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderColor: '#adabab2e',
-        borderLeftWidth: 2, 
-        borderRightWidth: 2,
-        borderTopWidth: 2,
-        borderBottomWidth: 2,
-    },
-    detailsContainer: { 
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex: 1, 
-    },
-    iconWrapper: {
-        width: 45,
-        height: 45,
-        borderRadius: 22.5,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#1e1e1e', 
-        marginRight: 15,
-        borderWidth: 1,
-    },
-    textContainer: {
-        flexDirection: 'column',
-        justifyContent: 'center',
-    },
-    nameText: {
-        fontSize: 16,
-        color: '#fff',
-        fontWeight: 'bold',
-    },
-    nextChargeText: {
-        fontSize: 12,
-        color: '#aaa',
-        marginTop: 2,
-    },
-    actionsContainer: {
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-    },
-    valueText: {
-        fontSize: 16,
-        color: '#fff', 
-        fontWeight: '600',
-        marginBottom: 5,
-    },
-    actionButtons: {
-        flexDirection: 'row',
-    },
-    actionButton: {
-        marginLeft: 10,
-        padding: 4,
-    }
-});
-
+import { useTheme } from '../context/ThemeContext'; 
 
 const getCategoryIcon = (category: Subscription['category'] | string) => {
     switch (category) {
-        case 'Streaming':
-            return { name: 'tv-outline', color: '#03A9F4' };
-        case 'Música':
-            return { name: 'musical-notes-outline', color: '#FF9800' };
-        case 'Software':
-            return { name: 'code-slash-outline', color: '#8B5CF6' };
-        case 'Educação':
-            return { name: 'book-outline', color: '#4eefa4ff' };
-        case 'Outros':
-        default:
-            return { name: 'cube-outline', color: '#ccc' };
+        case 'Streaming': return { name: 'tv-outline', color: '#03A9F4' };
+        case 'Música': return { name: 'musical-notes-outline', color: '#FF9800' };
+        case 'Software': return { name: 'code-slash-outline', color: '#8B5CF6' };
+        case 'Educação': return { name: 'book-outline', color: '#4eefa4ff' };
+        default: return { name: 'cube-outline', color: '#ccc' };
     }
 };
 
-interface SubscriptionCardProps {
-    subscription: Subscription;
-}
-
-const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription }) => {
+const SubscriptionCard: React.FC<{ subscription: Subscription }> = ({ subscription }) => {
+    const { theme } = useTheme();
     const navigation = useNavigation();
     const { remove } = useSubscriptions(); 
-    const nextChargeDate = subscription.firstChargeDate;
-    const formattedDate = nextChargeDate.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' });
+    
+    const formattedDate = subscription.firstChargeDate.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' });
     const formattedValue = subscription.value.toFixed(2).replace('.', ',');
     const { name: iconName, color: iconColor } = getCategoryIcon(subscription.category);
 
-    const handleRemove = () => {
-        Alert.alert(
-            "Inativar Assinatura",
-            `Tem certeza que deseja inativar a assinatura "${subscription.name}"?`,
-            [
-                {
-                    text: "Cancelar",
-                    style: "cancel"
-                },
-                {
-                    text: "Inativar",
-                    onPress: async () => {
-                        try {
-                            await remove(subscription.id);
-                            Alert.alert("Sucesso", `${subscription.name} foi inativada.`);
-                        } catch (error) {
-                            Alert.alert("Erro", "Não foi possível inativar a assinatura.");
-                        }
-                    },
-                    style: "destructive"
-                }
-            ]
-        );
-    };
-
-    const handleEdit = () => {
-        navigation.navigate('EdicaoAssinaturas' as never, { subscriptionId: subscription.id } as never); 
-    };
-    const handleViewDetails = () => {
-        navigation.navigate('DetalhesAssinaturas' as never, { subscriptionId: subscription.id } as never);
-    };
+    // Estilos dinâmicos do Card usando useMemo para estabilidade
+    const styles = useMemo(() => StyleSheet.create({
+        card: {
+            flexDirection: 'row',
+            backgroundColor: theme.surface, // Usa a cor de superfície do tema
+            borderRadius: 15,
+            padding: 15,
+            marginBottom: 12,
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderColor: theme.border, // Usa a cor de borda do tema
+            borderWidth: 1,
+            // Sombra leve para o modo claro
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: theme.isDark ? 0 : 0.1,
+            shadowRadius: 2,
+            elevation: theme.isDark ? 0 : 2,
+        },
+        iconWrapper: {
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: theme.isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', 
+            marginRight: 15,
+            borderWidth: 1,
+            borderColor: iconColor,
+        },
+        nameText: {
+            fontSize: 16,
+            color: theme.text,
+            fontWeight: 'bold',
+        },
+        nextChargeText: {
+            fontSize: 12,
+            color: theme.text,
+            opacity: 0.6,
+            marginTop: 2,
+        },
+        valueText: {
+            fontSize: 16,
+            color: theme.text, 
+            fontWeight: 'bold',
+            marginBottom: 5,
+        }
+    }), [theme, iconColor]);
 
     return (
-        <View style={cardStyles.card}>
+        <View style={styles.card}>
             <TouchableOpacity 
-                style={cardStyles.detailsContainer}
-                onPress={handleViewDetails}
+                style={staticCardStyles.detailsContainer}
+                onPress={() => navigation.navigate('DetalhesAssinaturas' as never, { subscriptionId: subscription.id } as never)}
             >
-                <View style={[cardStyles.iconWrapper, { borderColor: iconColor }]}>
-                    <Ionicons name={iconName} size={30} color={iconColor} />
+                <View style={styles.iconWrapper}>
+                    <Ionicons name={iconName as any} size={28} color={iconColor} />
                 </View>
 
-                <View style={cardStyles.textContainer}>
-                    <Text style={cardStyles.nameText}>{subscription.name}</Text>
-                    <Text style={cardStyles.nextChargeText}>
-                        Próximo pagamento em {formattedDate}
-                    </Text>
+                <View style={staticCardStyles.textContainer}>
+                    <Text style={styles.nameText}>{subscription.name}</Text>
+                    <Text style={styles.nextChargeText}>Vence em {formattedDate}</Text>
                 </View>
             </TouchableOpacity>
 
-            <View style={cardStyles.actionsContainer}>
-                <Text style={cardStyles.valueText}>R$ {formattedValue}</Text>
-                
-                <View style={cardStyles.actionButtons}>
-
-                    <TouchableOpacity onPress={handleEdit} style={cardStyles.actionButton}>
+            <View style={staticCardStyles.actionsContainer}>
+                <Text style={styles.valueText}>R$ {formattedValue}</Text>
+                <View style={staticCardStyles.actionButtons}>
+                    <TouchableOpacity 
+                        onPress={() => navigation.navigate('EdicaoAssinaturas' as never, { subscriptionId: subscription.id } as never)} 
+                        style={staticCardStyles.actionButton}
+                    >
                         <Ionicons name="pencil-outline" size={20} color="#8B5CF6" />
                     </TouchableOpacity>
-                    
-                    <TouchableOpacity onPress={handleRemove} style={cardStyles.actionButton}>
+                    <TouchableOpacity 
+                        onPress={() => {
+                            Alert.alert("Inativar", `Inativar ${subscription.name}?`, [
+                                { text: "Não", style: "cancel" },
+                                { text: "Sim", onPress: () => remove(subscription.id) }
+                            ]);
+                        }} 
+                        style={staticCardStyles.actionButton}
+                    >
                         <Ionicons name="trash-outline" size={20} color="#FF9800" /> 
                     </TouchableOpacity>
                 </View>
@@ -196,34 +117,67 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription }) => 
     );
 };
 
-
 const ListaAssinaturas = () => {
+    const { theme } = useTheme();
     const { activeSubscriptions, isLoading } = useSubscriptions(); 
+
+    const dynamicStyles = useMemo(() => StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: theme.background, 
+            paddingHorizontal: 15,
+            paddingTop: 10,
+        },
+        emptyContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: 40,
+        },
+        emptyText: {
+            color: theme.text,
+            opacity: 0.6,
+            textAlign: 'center',
+            fontSize: 16,
+            marginTop: 10,
+        }
+    }), [theme]);
 
     if (isLoading) {
         return (
-            <View style={styles.container}>
-                <Text style={styles.loadingText}>Carregando assinaturas...</Text>
+            <View style={[dynamicStyles.container, { justifyContent: 'center' }]}>
+                <ActivityIndicator size="large" color={theme.primary} />
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>            
+        <View style={dynamicStyles.container}>            
             {activeSubscriptions.length === 0 ? (
-                <Text style={styles.emptyText}>Você ainda não tem assinaturas ativas. Adicione uma para começar!</Text>
+                <View style={dynamicStyles.emptyContainer}>
+                    <Ionicons name="archive-outline" size={60} color={theme.text} style={{ opacity: 0.2 }} />
+                    <Text style={dynamicStyles.emptyText}>Nenhuma assinatura ativa encontrada.</Text>
+                </View>
             ) : (
                 <FlatList
                     data={activeSubscriptions}
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => <SubscriptionCard subscription={item} />}
-                    contentContainerStyle={styles.listContent}
+                    contentContainerStyle={{ paddingBottom: 120, paddingTop: 10 }}
+                    showsVerticalScrollIndicator={false}
                 />
             )}
-
             <AddButton />
         </View>
     );
 };
+
+const staticCardStyles = StyleSheet.create({
+    detailsContainer: { flexDirection: 'row', alignItems: 'center', flex: 1 },
+    textContainer: { flexDirection: 'column', justifyContent: 'center' },
+    actionsContainer: { flexDirection: 'column', alignItems: 'flex-end' },
+    actionButtons: { flexDirection: 'row' },
+    actionButton: { marginLeft: 12, padding: 4 }
+});
 
 export default ListaAssinaturas;

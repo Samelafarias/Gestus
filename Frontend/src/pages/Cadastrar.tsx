@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvo
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import * as AuthStorage from '../services/AuthService'; // Importação do novo serviço
+import * as AuthStorage from '../services/AuthService'; 
 
 const styles = StyleSheet.create({
   container: {
@@ -25,7 +25,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#fff',
-
   },
   subtitle: {
     fontSize: 12,
@@ -76,7 +75,6 @@ const styles = StyleSheet.create({
     marginRight: 10,
     color: '#777',
   },
-  
   registerButtonGradient: { 
     borderRadius: 25,
     paddingVertical: 15,
@@ -112,43 +110,52 @@ const styles = StyleSheet.create({
 export default function RegisterPage() { 
   const navigation = useNavigation();
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false); // Estado para feedback visual
   
   const [nome, setNome] = useState(''); 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleRegister = async () => { // Função agora é assíncrona
+  const handleRegister = async () => {
+    // Validação de campos vazios
     if (!nome || !email || !password || !confirmPassword) {
       Alert.alert('Campos obrigatórios', 'Por favor, preencha todos os campos.');
       return;
     }
 
+    // Validação de senhas coincidentes
     if (password !== confirmPassword) {
-      Alert.alert('Erro', 'As senhas não coincidem. Por favor, verifique.');
+      Alert.alert('Erro', 'As senhas não coincidem.');
       return;
     }
-    
-    // 1. Verifica se já existe um usuário (simulando que é um app de usuário único)
-    const storedUser = await AuthStorage.getStoredUser();
-    if (storedUser) {
-        Alert.alert('Erro', 'Já existe uma conta cadastrada neste dispositivo. Por favor, faça login.');
-        return;
-    }
 
-    // 2. Salva o novo usuário no AsyncStorage
+    setLoading(true);
+
     try {
-        await AuthStorage.saveUser({ 
-            name: nome, 
-            email: email, 
-            passwordHash: password // Salvando a senha pura, o que é inseguro, mas ok para este app offline
-        });
-        
-        Alert.alert('Sucesso', 'Cadastro realizado! Agora você pode fazer login.');
-        navigation.navigate('Login'); 
+      // Chamada real ao Firebase Auth e Firestore através do AuthService
+      await AuthStorage.signUp(nome, email, password);
+      
+      Alert.alert('Sucesso', 'Sua conta foi criada com sucesso!', [
+        { text: 'OK', onPress: () => navigation.navigate('Login') }
+      ]);
+    } catch (error: any) {
+      console.error(error);
+      
+      // Tratamento de erros específicos do Firebase
+      let errorMessage = 'Não foi possível realizar o cadastro.';
+      
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'Este e-mail já está em uso por outra conta.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'O formato do e-mail é inválido.';
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'A senha deve ter pelo menos 6 caracteres.';
+      }
 
-    } catch (e) {
-        Alert.alert('Erro', 'Falha ao salvar o cadastro no dispositivo.');
+      Alert.alert('Erro no Cadastro', errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -164,13 +171,11 @@ export default function RegisterPage() {
             style={styles.logo}
             resizeMode="contain"
           />
-          
           <Text style={styles.subtitle}>Seu Gerenciador de assinaturas</Text>
         </View>
 
         <View style={styles.formContainer}>
           <Text style={styles.loginTitle}>Cadastrar</Text> 
-          
           
           <Text style={styles.label}>Nome:</Text>
           <View style={styles.inputWrapper}>
@@ -230,7 +235,6 @@ export default function RegisterPage() {
               value={confirmPassword} 
               onChangeText={setConfirmPassword} 
             />
-            
             <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
               <Ionicons
                 name={passwordVisible ? 'eye-off' : 'eye'}
@@ -240,19 +244,21 @@ export default function RegisterPage() {
             </TouchableOpacity>
           </View>
 
-          
-          <TouchableOpacity onPress={handleRegister}> 
+          <TouchableOpacity onPress={handleRegister} disabled={loading}> 
             <LinearGradient
               colors={['#FF9800', '#8B5CF6', '#03A9F4']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.registerButtonGradient} 
             >
-              <Text style={styles.registerButtonText}>Cadastre-se</Text>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.registerButtonText}>Cadastre-se</Text>
+              )}
             </LinearGradient>
           </TouchableOpacity>
 
-         
           <TouchableOpacity
             style={styles.loginLinkButton} 
             onPress={() => navigation.navigate('Login')} 

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView, Alert,} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView, Alert, } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import * as AuthStorage from '../services/AuthService'; 
+import auth from '@react-native-firebase/auth'; // Importação direta do Firebase Auth
 
 const styles = StyleSheet.create({
     container: {
@@ -100,6 +100,7 @@ export default function RedefinirSenha() {
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+
     const handleRedefinirSenha = async () => { 
        if (!password || !confirmPassword) {
           Alert.alert('Campos Obrigatórios', 'Por favor, preencha a nova senha e a confirmação.');
@@ -117,21 +118,35 @@ export default function RedefinirSenha() {
        }
 
        try {
-            await AuthStorage.updateUser({ passwordHash: password }); 
-        
-            Alert.alert(
-                'Sucesso!', 
-                'Sua senha foi redefinida com sucesso. Faça login para continuar.',
-                [
-                   { 
-                      text: "Fazer Login", 
-                      onPress: () => navigation.navigate('Login') 
-                   }
-                ]
-             );
-       } catch (e) {
-            console.error("Erro ao redefinir a senha:", e);
-            Alert.alert('Erro', 'Falha ao redefinir a senha. Tente novamente.');
+            // No Firebase, para redefinir a senha de um usuário logado:
+            const user = auth().currentUser;
+            
+            if (user) {
+                await user.updatePassword(password);
+                
+                Alert.alert(
+                    'Sucesso!', 
+                    'Sua senha foi redefinida com sucesso.',
+                    [
+                       { 
+                          text: "Ok", 
+                          onPress: () => navigation.navigate('Login') 
+                       }
+                    ]
+                 );
+            } else {
+                // Caso o usuário não esteja logado, o fluxo correto do Firebase é via e-mail.
+                // Aqui simulamos o feedback para manter a interface, mas alertamos a necessidade de login.
+                Alert.alert('Erro de Autenticação', 'Para segurança, você precisa estar autenticado ou usar o link enviado por e-mail.');
+            }
+
+       } catch (error: any) {
+            console.error("Erro ao redefinir a senha:", error);
+            if (error.code === 'auth/requires-recent-login') {
+                Alert.alert('Erro de Segurança', 'Esta operação é sensível e requer um login recente. Por favor, saia e entre novamente.');
+            } else {
+                Alert.alert('Erro', 'Falha ao redefinir a senha. Tente novamente.');
+            }
        }
     };
 
@@ -153,7 +168,7 @@ export default function RedefinirSenha() {
           <View style={styles.formContainer}>
             <Text style={styles.loginTitle}>Redefinir Senha</Text>
             <Text style={styles.formSubtitle}>
-             Redefina sua nova senha. (Conta: {userEmail || 'Desconhecida'})
+             Redefina sua nova senha para a conta: {'\n'}{userEmail || 'Desconhecida'}
             </Text>
 
             <Text style={styles.label}>Nova Senha:</Text>

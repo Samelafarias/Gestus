@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView, Alert,} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView, Alert, ActivityIndicator} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import * as AuthStorage from '../services/AuthService'; // Importação do novo serviço
+import * as AuthStorage from '../services/AuthService';
 
 const styles = StyleSheet.create({
    container: {
@@ -109,33 +109,56 @@ const styles = StyleSheet.create({
 });
 
 export default function LoginPage() {
-   const navigation = useNavigation();
+   const navigation = useNavigation<any>();
    const [passwordVisible, setPasswordVisible] = useState(false);
    const [email, setEmail] = useState('');
    const [password, setPassword] = useState('');
+   const [loading, setLoading] = useState(false); // Estado para feedback visual
 
-   const handleLogin = async () => { // Função agora é assíncrona
-     if (!email || !password) {
+   const handleLogin = async () => {
+      if (!email.trim() || !password.trim()) {
         Alert.alert('Campos obrigatórios', 'Preencha o email e a senha.');
         return;
-     }
+      }
 
-    // 1. Busca o usuário cadastrado no AsyncStorage
-    const storedUser = await AuthStorage.getStoredUser();
+      setLoading(true);
 
-    // 2. Compara as credenciais
-    if (storedUser && storedUser.email === email && storedUser.passwordHash === password) {
-        // Sucesso: registra o login e navega
-        await AuthStorage.setLoggedIn(true);
-          navigation.navigate('App'); 
-    } else {
-        // Falha: Verifica se há algum usuário cadastrado. Se não houver, sugere cadastro.
-        if (!storedUser) {
-            Alert.alert('Erro', 'Nenhum usuário encontrado. Cadastre-se primeiro.');
-        } else {
-            Alert.alert('Erro', 'Email ou senha incorretos.');
+      try {
+        // Agora chamamos a função que utiliza o @react-native-firebase/auth
+        await AuthStorage.signIn(email.trim(), password);
+        
+        // Se o login for bem-sucedido, o Firebase manterá o estado do usuário.
+        // Navegamos para o Stack principal do App (onde está o Drawer).
+        navigation.navigate('App'); 
+
+      } catch (error: any) {
+        // Tratamento de erros específicos do Firebase Auth
+        console.log("Erro de Login:", error.code);
+        
+        let errorMessage = 'Ocorreu um erro ao tentar fazer login. Tente novamente.';
+
+        switch (error.code) {
+          case 'auth/user-not-found':
+            errorMessage = 'Nenhum usuário encontrado com este e-mail.';
+            break;
+          case 'auth/wrong-password':
+            errorMessage = 'Senha incorreta.';
+            break;
+          case 'auth/invalid-email':
+            errorMessage = 'O formato do e-mail é inválido.';
+            break;
+          case 'auth/user-disabled':
+            errorMessage = 'Este usuário foi desativado.';
+            break;
+          case 'auth/too-many-requests':
+            errorMessage = 'Muitas tentativas. Tente novamente mais tarde.';
+            break;
         }
-     }
+
+        Alert.alert('Erro no Login', errorMessage);
+      } finally {
+        setLoading(false);
+      }
    };
 
    return (
@@ -143,7 +166,7 @@ export default function LoginPage() {
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
      >
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
           <View style={styles.header}>
              <Image
                source={require('../../assets/LogoComp.png')}
@@ -166,6 +189,7 @@ export default function LoginPage() {
                   onChangeText={setEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
+                  autoCorrect={false}
                />
              </View>
 
@@ -188,26 +212,32 @@ export default function LoginPage() {
                </TouchableOpacity>
              </View>
 
-             <TouchableOpacity style={styles.forgotButton}>
-               <Text style={styles.forgotText}   
-               onPress={() => navigation.navigate('ResetPassword')}>Esqueceu sua senha?</Text>
+             <TouchableOpacity 
+                style={styles.forgotButton}
+                onPress={() => navigation.navigate('ResetPassword')}
+             >
+               <Text style={styles.forgotText}>Esqueceu sua senha?</Text>
              </TouchableOpacity>
 
-             <TouchableOpacity onPress={handleLogin}>
+             <TouchableOpacity onPress={handleLogin} disabled={loading}>
                <LinearGradient
                   colors={['#FF9800', '#8B5CF6', '#03A9F4']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
-                  style={styles.loginButton}
+                  style={[styles.loginButton, { opacity: loading ? 0.7 : 1 }]}
                >
-                  <Text style={styles.loginText}>Login</Text>
+                  {loading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.loginText}>Login</Text>
+                  )}
                </LinearGradient>
              </TouchableOpacity>
 
              <TouchableOpacity
-               style={styles.registerButton}
-               onPress={() => navigation.navigate('Register')}
-             >
+                style={styles.registerButton}
+                onPress={() => navigation.navigate('Cadastrar')} 
+              >
                <LinearGradient
                   colors={['#FF9800', '#8B5CF6', '#03A9F4']}
                   start={{ x: 0, y: 0 }}

@@ -1,4 +1,5 @@
 export const darkTheme = {
+  isDark: true, // Adicionado
   background: '#1e1e1e',
   surface: '#282828',
   text: '#ffffff',
@@ -8,6 +9,7 @@ export const darkTheme = {
 };
 
 export const lightTheme = {
+  isDark: false, // Adicionado
   background: '#f5f5f5',
   surface: '#ffffff',
   text: '#000000',
