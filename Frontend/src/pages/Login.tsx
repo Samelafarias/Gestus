@@ -234,23 +234,23 @@ export default function LoginPage() {
                </LinearGradient>
              </TouchableOpacity>
 
-             <TouchableOpacity
-                style={styles.registerButton}
-                onPress={() => navigation.navigate('Cadastrar')} 
+            <TouchableOpacity
+              style={styles.registerButton}
+              onPress={() => navigation.navigate('Register')} 
+            >
+              <LinearGradient
+                colors={['#FF9800', '#8B5CF6', '#03A9F4']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.registerBorder}
               >
-               <LinearGradient
-                  colors={['#FF9800', '#8B5CF6', '#03A9F4']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.registerBorder}
-               >
-                  <View style={styles.registerInner}>
-                    <Text style={styles.registerText}>
-                       Ainda não tem conta? Crie uma agora
-                    </Text>
-                  </View>
-               </LinearGradient>
-             </TouchableOpacity>
+                <View style={styles.registerInner}>
+                  <Text style={styles.registerText}>
+                    Ainda não tem conta? Crie uma agora
+                  </Text>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
         </ScrollView>
      </KeyboardAvoidingView>

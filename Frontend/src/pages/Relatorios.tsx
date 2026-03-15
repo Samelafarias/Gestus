@@ -17,7 +17,7 @@ const RelatorioPage = () => {
     mainContainer: {
         flex: 1,
         backgroundColor: theme.background, 
-        padding: 20,
+        padding: 10,
     },
     loadingContainer: {
       flex: 1,
