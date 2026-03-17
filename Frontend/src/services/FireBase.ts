@@ -1,19 +1,17 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
 
 const firebaseConfig = {
-  apiKey: "AIzaSyANRCUXIAliNrI3JWXYzMpsHmPYndIdZzE",
-  authDomain: "gestus-905ae.firebaseapp.com",
-  projectId: "gestus-905ae",
-  storageBucket: "gestus-905ae.firebasestorage.app",
-  messagingSenderId: "742655620870",
-  appId: "1:742655620870:web:d5a170bc6bf4e9d37fd087",
-  measurementId: "G-RQ6PGLNE9G"
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+
+export { app, analytics };
